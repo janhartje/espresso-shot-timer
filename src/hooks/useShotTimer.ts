@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Accelerometer } from 'expo-sensors';
-import { Platform } from 'react-native';
+import { useCalibration } from './useCalibration';
+import { calculateSD, getSensitivityMultiplier, SensitivityLevel } from '../utils/math';
+import { DebugLogger } from '../utils/logger';
 
-export type SensitivityLevel = 'LOW' | 'MEDIUM' | 'HIGH';
+export { SensitivityLevel }; // Re-export for components that use it
 export type ShotStatus = 'IDLE' | 'BREWING' | 'FINISHED';
 
 interface UseShotTimerProps {
@@ -15,7 +17,7 @@ interface UseShotTimerProps {
 export const useShotTimer = ({
   threshold = 1.1, 
   startDelay = 400,
-  stopDelay = 1000, 
+  stopDelay = 200, 
   smoothingBufferSize = 50, 
 }: UseShotTimerProps = {}) => {
   const [status, setStatus] = useState<ShotStatus>('IDLE');
@@ -35,30 +37,54 @@ export const useShotTimer = ({
   const startTimeRef = useRef<number | null>(null);
   const subscriptionRef = useRef<any>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | number | null>(null);
-  const ignoreSensorsUntilRef = useRef<number>(0); // Cooldown to prevent touch vibrations triggering timer
+  const ignoreSensorsUntilRef = useRef<number>(0);
+  const lastUiUpdateRef = useRef<number>(0);
   
-  // Calibration
-  const [isCalibrating, setIsCalibrating] = useState(false);
-  const [calibrationTimeLeft, setCalibrationTimeLeft] = useState(0);
-  const [calibrationFinished, setCalibrationFinished] = useState(false);
-
   // Variance-Based Logic
   const [currentDeviation, setCurrentDeviation] = useState(0); 
   const [activeVibrationLevel, setActiveVibrationLevel] = useState(0.05); 
   const [sensitivityLevel, setSensitivityLevel] = useState<SensitivityLevel>('HIGH');
+  
+  // Debug Mode
+  const [debugMode, setDebugMode] = useState(false);
+  const debugModeRef = useRef(false);
+  
+  useEffect(() => {
+      debugModeRef.current = debugMode;
+  }, [debugMode]);
 
-  // Sensitivity helper
-  const getSensitivityMultiplier = (level: SensitivityLevel) => {
-    switch(level) {
-        case 'HIGH': return 0.2; 
-        case 'MEDIUM': return 0.5; 
-        case 'LOW': return 0.8; 
-    }
-  };
+  const toggleDebugMode = useCallback(() => {
+      setDebugMode(prev => !prev);
+  }, []);
+
+  // Initialize Logger
+  const loggerRef = useRef(new DebugLogger(debugModeRef));
+  const logger = loggerRef.current;
+
+
 
   const currentThreshold = activeVibrationLevel * getSensitivityMultiplier(sensitivityLevel);
 
+  // Calibration Hook
+  const { 
+      isCalibrating, 
+      calibrationTimeLeft, 
+      calibrationFinished, 
+      startCalibration, 
+      stopCalibration,
+      calibrationBuffer
+  } = useCalibration({
+      logger,
+      ignoreSensorsRef: ignoreSensorsUntilRef,
+      onCalibrationComplete: (newLevel, newSensitivity) => {
+          setActiveVibrationLevel(newLevel);
+          setSensitivityLevel(newSensitivity);
+      }
+  });
+
+
   const startTimer = useCallback(() => {
+    logger.log('[Timer] Starting timer...');
     setStatus('BREWING');
     startTimeRef.current = Date.now();
     
@@ -67,10 +93,11 @@ export const useShotTimer = ({
     timerIntervalRef.current = setInterval(() => {
         if (startTimeRef.current) {
           const now = Date.now();
-          setElapsedTime(now - (startTimeRef.current as number));
+          const elapsed = now - (startTimeRef.current as number);
+          setElapsedTime(elapsed);
         }
-    }, 100); 
-  }, []);
+    }, 16); 
+  }, [logger]);
 
   const stopTimer = useCallback((endTimeOverride?: number) => {
     // Only stop if we are actually BREWING to avoid duplicate calls/resets
@@ -87,7 +114,6 @@ export const useShotTimer = ({
       const endTime = (typeof endTimeOverride === 'number') ? endTimeOverride : Date.now();
       const finalTime = Math.max(0, endTime - startTimeRef.current);
       
-      // Batch updates are automatic in React 18, but explicit ordering helps clarity
       setElapsedTime(finalTime);
       setLastShotTime(finalTime);
     }
@@ -103,71 +129,6 @@ export const useShotTimer = ({
     ignoreSensorsUntilRef.current = Date.now() + 1000; 
   }, []);
 
-  // Calibration functions
-  const startCalibration = useCallback(() => {
-    setIsCalibrating(true);
-    setCalibrationFinished(false);
-    setCalibrationTimeLeft(3); 
-  }, []);
-
-  const stopCalibration = useCallback(() => {
-    setIsCalibrating(false);
-    setCalibrationTimeLeft(0);
-  }, []);
-
-  const finishCalibration = useCallback((buffer: number[]) => {
-      if (buffer.length === 0) {
-          stopCalibration();
-          return;
-      }
-      
-      const sum = buffer.reduce((a, b) => a + b, 0);
-      const avgSD = sum / buffer.length;
-      
-      const safeActiveLevel = Math.max(0.01, avgSD);
-      
-      setActiveVibrationLevel(safeActiveLevel);
-      setSensitivityLevel('MEDIUM'); 
-      
-      setCalibrationFinished(true);
-      setTimeout(() => {
-          setIsCalibrating(false);
-          setCalibrationFinished(false);
-      }, 3000);
-  }, [stopCalibration]);
-
-  const calibrationCallbackRef = useRef<((val: number) => void) | null>(null);
-
-  // Calibration effect
-  useEffect(() => {
-    if (!isCalibrating || calibrationFinished) {
-        calibrationCallbackRef.current = null;
-        return;
-    }
-
-    const buffer: number[] = [];
-    
-    calibrationCallbackRef.current = (sd: number) => {
-        buffer.push(sd);
-    };
-
-    const interval = setInterval(() => {
-        setCalibrationTimeLeft(prev => {
-            if (prev <= 1) {
-                clearInterval(interval);
-                finishCalibration(buffer);
-                return 0; 
-            }
-            return prev - 1;
-        });
-    }, 1000);
-
-    return () => {
-        clearInterval(interval);
-        calibrationCallbackRef.current = null;
-    };
-  }, [isCalibrating, calibrationFinished, finishCalibration]);
-
   const thresholdRef = useRef(currentThreshold);
   useEffect(() => {
       thresholdRef.current = currentThreshold;
@@ -176,16 +137,7 @@ export const useShotTimer = ({
   useEffect(() => {
     _subscribe();
     return () => _unsubscribe();
-  }, [currentThreshold]); 
-
-  // Helper for SD
-  const calculateSD = (arr: number[]) => {
-      if (arr.length === 0) return 0;
-      const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
-      const sqDiffs = arr.map(v => Math.pow(v - mean, 2));
-      const avgSqDiff = sqDiffs.reduce((a, b) => a + b, 0) / arr.length;
-      return Math.sqrt(avgSqDiff);
-  };
+  }, [currentThreshold, isCalibrating]); 
 
   const _subscribe = () => {
     Accelerometer.setUpdateInterval(20); 
@@ -202,17 +154,21 @@ export const useShotTimer = ({
       
       const stdDev = calculateSD(buffer);
       
-      setCurrentMagnitude(magnitude); 
-      setCurrentDeviation(stdDev);
-
-      if (calibrationCallbackRef.current) {
-        calibrationCallbackRef.current(stdDev);
+      // OPTIMIZATION: Handle calibration first to avoid unnecessary UI updates
+      if (isCalibrating) {
+        calibrationBuffer.current.push(stdDev);
         return;
       }
-
+      
       const now = Date.now();
       
-      // Ignore sensors if we are in a "cooldown" phase (e.g. just pressed stop)
+      // Throttle UI updates to ~15fps (66ms)
+      if (now - lastUiUpdateRef.current > 66) {
+          setCurrentMagnitude(magnitude); 
+          setCurrentDeviation(stdDev);
+          lastUiUpdateRef.current = now;
+      }
+
       if (now < ignoreSensorsUntilRef.current) {
           lastAboveThresholdTimeRef.current = null; // Reset triggers
           return;
@@ -220,20 +176,21 @@ export const useShotTimer = ({
 
       const currentStatus = statusRef.current; 
 
-      // DEBUG: Throttle logs to avoid spamming
-      if (Math.random() < 0.05) {
-          console.log(`[Sensor] Mag: ${magnitude.toFixed(3)} | Dev: ${stdDev.toFixed(3)} | Thresh: ${thresholdRef.current.toFixed(3)} | State: ${currentStatus}`);
+      if (debugModeRef.current) {
+        if (Math.random() < 0.05) {
+            console.log(`[Sensor] Mag: ${magnitude.toFixed(3)} | Dev: ${stdDev.toFixed(3)} | Thresh: ${thresholdRef.current.toFixed(3)} | State: ${currentStatus}`);
+        }
       }
 
       if (currentStatus === 'IDLE' || currentStatus === 'FINISHED') {
         const isStartTrigger = stdDev > thresholdRef.current;
 
         if (isStartTrigger) {
-            console.log(`[Trigger] Start conditions met. Mag: ${magnitude.toFixed(3)}`);
+            logger.log(`[Trigger] Start conditions met. Mag: ${magnitude.toFixed(3)}`);
             if (!lastAboveThresholdTimeRef.current) {
                 lastAboveThresholdTimeRef.current = now;
             } else if (now - lastAboveThresholdTimeRef.current > startDelay) {
-                console.log(`[Action] STARTING TIMER`);
+                logger.log(`[Action] STARTING TIMER`); 
                 if (currentStatus === 'FINISHED') resetTimer();
                 startTimer();
                 lastAboveThresholdTimeRef.current = null; 
@@ -249,7 +206,7 @@ export const useShotTimer = ({
             if (!lastBelowThresholdTimeRef.current) {
                 lastBelowThresholdTimeRef.current = now;
             } else if (now - lastBelowThresholdTimeRef.current > stopDelay) {
-                console.log(`[Action] STOPPING TIMER`);
+                logger.log(`[Action] STOPPING TIMER`); 
                 // Pass the time when vibration ACTUALLY started dropping below threshold
                 stopTimer(lastBelowThresholdTimeRef.current);
                 lastBelowThresholdTimeRef.current = null; 
@@ -270,7 +227,7 @@ export const useShotTimer = ({
     status,
     elapsedTime,
     currentMagnitude,
-    currentDeviation, // Expose for UI
+    currentDeviation, 
     lastShotTime,
     startTimer,    
     stopTimer,     
@@ -280,9 +237,11 @@ export const useShotTimer = ({
     isCalibrating,
     calibrationTimeLeft,
     calibrationFinished,
-    baseline: activeVibrationLevel, // expose active level as baseline
+    baseline: activeVibrationLevel, 
     threshold: currentThreshold,
     sensitivityLevel,
-    setSensitivityLevel
+    setSensitivityLevel,
+    debugMode,
+    toggleDebugMode
   };
 };

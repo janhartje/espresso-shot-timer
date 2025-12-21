@@ -6,7 +6,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, w
 
 interface CalibrationCardProps {
   onPress: () => void;
-  isCalibrating?: boolean; // New prop
+  isCalibrating?: boolean;
   className?: string; 
 }
 
@@ -16,7 +16,6 @@ export const CalibrationCard: React.FC<CalibrationCardProps> = ({ onPress, isCal
   const scale = useSharedValue(1);
 
   const handlePress = () => {
-      // "Drückt sich ein" effect
       scale.value = withSequence(
           withTiming(0.95, { duration: 100 }),
           withSpring(1, { damping: 10 })
@@ -31,20 +30,33 @@ export const CalibrationCard: React.FC<CalibrationCardProps> = ({ onPress, isCal
   });
 
   return (
-    <AnimatedTouchable onPress={handlePress} className={className} activeOpacity={0.9} style={animatedStyle} disabled={isCalibrating}>
-        <View className="items-center justify-center flex-1">
-            <View className="items-center justify-center gap-2">
+    <AnimatedTouchable 
+        onPress={handlePress} 
+        className={`flex-1 w-full h-full ${className}`} 
+        activeOpacity={0.9} 
+        style={[animatedStyle, { flex: 1, width: '100%' }]} 
+        disabled={isCalibrating}
+    >
+        <GlassCard 
+            className="flex-1 w-full h-full"
+            contentClassName="items-center justify-center"
+        >
+            <View className="items-center justify-center gap-2 w-full px-2">
                 {isCalibrating ? (
-                    <ActivityIndicator color="#fff" size="small" />
+                    <ActivityIndicator color="#E6B778" size="large" />
                 ) : (
-                    <Settings size={22} color="#a1a1aa" /> 
+                    <Settings size={32} color="#E6B778" strokeWidth={1.5} style={{ opacity: 0.9 }} /> 
                 )}
                 
-                <Text className={`text-sm font-medium ${isCalibrating ? 'text-white' : 'text-zinc-500'}`}>
+                <Text 
+                    className={`text-lg font-medium tracking-wide text-center ${isCalibrating ? 'text-white' : 'text-[#E6B778]'}`}
+                    adjustsFontSizeToFit
+                    numberOfLines={1}
+                >
                     {isCalibrating ? 'Calibrating...' : 'Calibrate'}
                 </Text>
             </View>
-        </View>
+        </GlassCard>
     </AnimatedTouchable>
   );
 };

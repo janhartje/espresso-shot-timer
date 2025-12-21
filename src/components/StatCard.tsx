@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
+import { GlassCard } from './GlassCard';
 
 interface StatCardProps {
   label: string;
@@ -10,24 +11,35 @@ interface StatCardProps {
 
 export const StatCard: React.FC<StatCardProps> = ({ label, value, subValue, className }) => {
   return (
-    <View className={`justify-center ${className}`}>
-      <View className="mb-1">
-          <Text className="text-zinc-500 text-sm font-medium">
-            {label}
-          </Text>
-      </View>
+    <GlassCard 
+        className={`${className}`}
+        contentClassName="p-2 items-center justify-center"
+    >
+        {/* Header - Top Left Absolute */}
+        <View className="absolute top-5 left-5 z-20">
+             <Text className="text-zinc-500 text-sm tracking-widest font-bold uppercase opacity-80">
+                {label}
+             </Text>
+        </View>
       
-      <View className="flex-row items-baseline">
-          <Text className="text-white text-3xl font-bold">
+      <View className="flex-1 w-full items-center justify-center px-2">
+          <Text 
+            className="text-white text-[50px] font-medium tracking-tight shadow-md text-center"
+            adjustsFontSizeToFit
+            numberOfLines={1}
+          >
             {value}
           </Text>
+          {subValue && (
+            <Text 
+                className="text-zinc-500 text-sm mt-1 text-center"
+                adjustsFontSizeToFit
+                numberOfLines={1}
+            >
+              {subValue}
+            </Text>
+          )}
       </View>
-
-      {subValue && (
-        <Text className="text-zinc-600 text-xs mt-1">
-          {subValue}
-        </Text>
-      )}
-    </View>
+    </GlassCard>
   );
 };

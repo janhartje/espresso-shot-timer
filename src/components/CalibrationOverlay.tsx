@@ -1,12 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import { BlurView } from 'expo-blur'; // Or View fallback if Android issues persist
+import { BlurView } from 'expo-blur';
 import { Activity, CheckCircle, X } from 'lucide-react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
-// Since we had issues with BlurView on Android, we'll use a conditional approach or just a dark overlay.
-// For now, let's stick to the safe "dark overlay" style we used in GlassCard for Android, 
-// but we can try expo-blur on iOS for that nice effect.
+
 import { Platform } from 'react-native';
 
 interface CalibrationOverlayProps {

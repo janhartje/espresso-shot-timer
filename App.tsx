@@ -1,6 +1,6 @@
-import 'react-native-gesture-handler';
 import React from 'react';
-import { View, Text, SafeAreaView, Platform, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { View, Text, Platform, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Settings } from 'lucide-react-native';
@@ -14,7 +14,7 @@ import { TimerCard } from './src/components/TimerCard';
 import { StatCard } from './src/components/StatCard';
 import { GlassCard } from './src/components/GlassCard';
 import { CalibrationCard } from './src/components/CalibrationCard';
-import { AdBanner } from './src/components/AdBanner'; // Import AdBanner
+
 
 export default function App() {
   const { width, height } = useWindowDimensions();
@@ -41,8 +41,14 @@ export default function App() {
     threshold,
     sensitivityLevel,
     setSensitivityLevel,
-    currentDeviation
+    currentDeviation,
+    debugMode,
+    toggleDebugMode
   } = useShotTimer();
+
+  // Debug Banner State
+  const [showDebugBanner, setShowDebugBanner] = React.useState(false);
+  const [debugBannerMessage, setDebugBannerMessage] = React.useState("");
 
   // Helper for Last Shot format
   const formatTimeSimple = (ms: number) => {
@@ -52,117 +58,189 @@ export default function App() {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView className="flex-1 bg-black">
-        <StatusBar style="light" />
-        
-        <CalibrationOverlay 
-          isVisible={isCalibrating} 
-          onCancel={cancelCalibration} 
-          timeLeft={calibrationTimeLeft} 
-          isFinished={calibrationFinished}
-        />
-
-        <View className="flex-1 px-4 pb-4 pt-2">
-          
-          {/* Header */}
-          <View className="flex-row justify-between items-center mb-4">
-              <View>
-                 <Text className="text-white text-2xl font-serif tracking-wider">Espresso Sense</Text>
-              </View>
-          </View>
-
-          {/* Main Content Area - Grid */}
-          <View className={`flex-1 gap-4 ${isLandscape ? 'flex-row' : 'flex-col'}`}>
+    <SafeAreaProvider>
+        <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#050505' }}>
+        <SafeAreaView className="flex-1 bg-[#050505]">
+            <StatusBar style="light" />
             
-             {isLandscape ? (
-                 <>
-                    {/* Left Col: Timer */}
-                    <View className="flex-1 h-full justify-center">
-                        <TimerCard 
-                            elapsedTime={elapsedTime} 
-                            status={status} 
-                            isCalibrating={isCalibrating}
-                            onStart={startTimer}
-                            onStop={stopTimer}
-                            onReset={resetTimer}
-                            className="flex-1 max-h-[500px]" // Limit height in landscape
-                        />
-                    </View>
+            {/* Background Gradient - Warm glow behind Timer */}
+            <View className="absolute inset-0">
+            <Svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+                <Defs>
+                <RadialGradient id="bgGlow" cx="25%" cy="40%" rx="50%" ry="50%">
+                    <Stop offset="0%" stopColor="#C88A53" stopOpacity="0.15" />
+                    <Stop offset="40%" stopColor="#8B5A2B" stopOpacity="0.08" />
+                    <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
+                </RadialGradient>
+                </Defs>
+                <Rect x="0" y="0" width="100%" height="100%" fill="url(#bgGlow)" />
+            </Svg>
+            </View>
+            
+            <CalibrationOverlay 
+            isVisible={isCalibrating} 
+            onCancel={cancelCalibration} 
+            timeLeft={calibrationTimeLeft} 
+            isFinished={calibrationFinished}
+            />
 
-                    {/* Right Col: Stats & Visualizer */}
-                    <View className="w-80 gap-4">
-                        {/* Top Row: Last Shot + Calibrate */}
-                        <View className="h-24 flex-row gap-4">
-                             <StatCard 
-                                label="Last Shot" 
-                                value={lastShotTime ? formatTimeSimple(lastShotTime) : '--'} 
-                                className="flex-1"
-                             />
-                             <CalibrationCard 
-                                onPress={calibrate}
-                                isCalibrating={isCalibrating}
-                                className="flex-1"
-                             />
-                        </View>
-                        
-                        <View className="flex-1 p-4 justify-between">
-                            <Text className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-2">Vibration</Text>
-                            <View className="flex-1 justify-center">
-                                <Visualizer magnitude={currentMagnitude} isActive={status === 'BREWING'} />
+            <View className="flex-1 p-3">
+            
+            {/* Main Content Area - Reference Layout */}
+            <View className="flex-1 w-full mx-auto">
+                {isLandscape ? (
+                    <View className="flex-1 flex-row gap-3 items-stretch">
+                        {/* Column 1: Timer */}
+                        <View 
+                            className="shadow-lg shadow-black/50"
+                            style={{ flex: 2.2 }}
+                        >
+                            <View className="flex-1 rounded-[32px] overflow-hidden">
+                                <TimerCard 
+                                    elapsedTime={elapsedTime} 
+                                    status={status} 
+                                    isCalibrating={isCalibrating}
+                                    onStart={startTimer}
+                                    onStop={stopTimer}
+                                    onReset={resetTimer}
+                                    onToggleDebug={() => {
+                                        toggleDebugMode();
+                                        const newMode = !debugMode;
+                                        setDebugBannerMessage(`Debug Mode: ${newMode ? "ON" : "OFF"}`);
+                                        setShowDebugBanner(true);
+                                        setTimeout(() => setShowDebugBanner(false), 2500);
+                                    }}
+                                    className="w-full h-full"
+                                />
                             </View>
                         </View>
 
-                         <AdBanner />
-                    </View>
-                 </>
-             ) : (
-                 <>
-                    {/* Top: Timer (Dominant Square) */}
-                    <View className="w-full aspect-square mb-4"> 
-                        <TimerCard 
-                            elapsedTime={elapsedTime} 
-                            status={status} 
-                            isCalibrating={isCalibrating}
-                            onStart={startTimer}
-                            onStop={stopTimer}
-                            onReset={resetTimer}
-                            className="flex-1"
-                        />
-                    </View>
+                        {/* Column 2: Visualizer */}
+                        <View 
+                            className="shadow-lg shadow-black/50"
+                            style={{ flex: 1 }}
+                        >
+                            <View className="flex-1 rounded-[32px] overflow-hidden">
+                                <Visualizer 
+                                    magnitude={currentMagnitude} 
+                                    isActive={status === 'BREWING'} 
+                                    className="w-full h-full" 
+                                />
+                            </View>
+                        </View>
 
-                     {/* Row: Last Shot + Calib */}
-                    <View className="h-24 flex-row gap-4">
-                         <StatCard 
-                            label="Last Shot" 
-                            value={lastShotTime ? formatTimeSimple(lastShotTime) : '--'} 
-                            className="flex-1"
-                         />
-                         <CalibrationCard 
-                            onPress={calibrate}
-                            isCalibrating={isCalibrating}
-                            className="flex-1"
-                         />
-                    </View>
-
-                    {/* Visualizer */}
-                    <View className="flex-1"> 
-                        <View className="flex-1 p-4 justify-between">
-                            <Text className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-2">Vibration</Text>
-                            <View className="flex-1 justify-center">
-                                <Visualizer magnitude={currentMagnitude} isActive={status === 'BREWING'} />
+                        {/* Column 3: Stats & Controls */}
+                        <View 
+                            className="flex-col gap-3"
+                            style={{ flex: 1, alignSelf: 'stretch' }}
+                        >
+                            <View className="flex-1 w-full shadow-lg shadow-black/50">
+                                <View className="flex-1 rounded-[32px] overflow-hidden">
+                                    <StatCard 
+                                        label="Last Shot:" 
+                                        value={lastShotTime ? formatTimeSimple(lastShotTime) : '--'} 
+                                        className="flex-1 w-full"
+                                    />
+                                </View>
+                            </View>
+                            <View className="flex-1 w-full shadow-lg shadow-black/50">
+                                <View className="flex-1 rounded-[32px] overflow-hidden">
+                                    <CalibrationCard 
+                                        onPress={calibrate}
+                                        isCalibrating={isCalibrating}
+                                        className="flex-1 w-full"
+                                    />
+                                </View>
                             </View>
                         </View>
                     </View>
+                ) : (
+                    // Portrait Layout
+                    <View className="flex-1 flex-col gap-3">
+                        {/* Top: Timer (Larger) */}
+                        <View 
+                            className="shadow-lg shadow-black/50"
+                            style={{ flex: 4.5 }}
+                        >
+                            <View className="flex-1 rounded-[32px] overflow-hidden">
+                                <TimerCard 
+                                    elapsedTime={elapsedTime} 
+                                    status={status} 
+                                    isCalibrating={isCalibrating}
+                                    onStart={startTimer}
+                                    onStop={stopTimer}
+                                    onReset={resetTimer}
+                                    onToggleDebug={() => {
+                                        toggleDebugMode();
+                                        const newMode = !debugMode;
+                                        setDebugBannerMessage(`Debug Mode: ${newMode ? "ON" : "OFF"}`);
+                                        setShowDebugBanner(true);
+                                        setTimeout(() => setShowDebugBanner(false), 2500);
+                                    }}
+                                    className="w-full h-full"
+                                />
+                            </View>
+                        </View>
 
-                    {/* Ad Footer */}
-                    <AdBanner />
-                 </>
-             )}
-          </View>
+                        {/* Middle: Visualizer */}
+                        <View 
+                            className="shadow-lg shadow-black/50"
+                            style={{ flex: 3.5 }}
+                        >
+                            <View className="flex-1 rounded-[32px] overflow-hidden">
+                                <Visualizer 
+                                    magnitude={currentMagnitude} 
+                                    isActive={status === 'BREWING'} 
+                                    className="w-full h-full" 
+                                />
+                            </View>
+                        </View>
 
-        </View>
-      </SafeAreaView>
-    </GestureHandlerRootView>
+                        {/* Bottom: Row for Stats */}
+                        <View 
+                            className="flex-row gap-3"
+                            style={{ flex: 2 }}
+                        >
+                            <View className="flex-1 shadow-lg shadow-black/50">
+                                <View className="flex-1 rounded-[32px] overflow-hidden">
+                                    <StatCard 
+                                        label="Last Shot:" 
+                                        value={lastShotTime ? formatTimeSimple(lastShotTime) : '--'} 
+                                        className="flex-1"
+                                    />
+                                </View>
+                            </View>
+                            <View className="flex-1 shadow-lg shadow-black/50">
+                                <View className="flex-1 rounded-[32px] overflow-hidden">
+                                    <CalibrationCard 
+                                        onPress={calibrate}
+                                        isCalibrating={isCalibrating}
+                                        className="flex-1"
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                )}
+
+
+            </View>
+            </View>
+
+            {/* Debug Toast Banner - Absolute Top Center */}
+            {showDebugBanner && (
+                <View className="absolute top-12 left-0 right-0 items-center z-50 pointer-events-none">
+                    <View className="bg-black/80 border border-white/10 px-6 py-3 rounded-full flex-row items-center gap-2 shadow-xl shadow-black">
+                        <View className={`w-2 h-2 rounded-full ${debugBannerMessage.includes("ON") ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`} />
+                        <Text className="text-white font-medium tracking-wide text-sm">
+                            {debugBannerMessage}
+                        </Text>
+                    </View>
+                </View>
+            )}
+
+        </SafeAreaView>
+        </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }
