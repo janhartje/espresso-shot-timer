@@ -3,6 +3,14 @@ name: Create Production Builds
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".gitignore"
+      - "LICENSE"
+      - "CODE_OF_CONDUCT.md"
+      - "CONTRIBUTING.md"
+      - ".github/**"
 
 jobs:
   build_android:
