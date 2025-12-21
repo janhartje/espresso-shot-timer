@@ -1,65 +1,78 @@
-# Espresso Shot Timer
+<div align="center">
+  <img src="./assets/icon.png" alt="Espresso Shot Timer Logo" width="120" height="120" />
 
-A high-end, precision utility app designed for home baristas. The Espresso Shot Timer utilizes your smartphone's accelerometer to detect the vibration of your espresso machine's pump, automatically starting and stopping the timer for hands-free extraction tracking.
+  # Espresso Shot Timer
+  
+  **Precision Brewing Assistant for Home Baristas**
+  
+  [![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
+  [![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+  [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg?style=for-the-badge)](https://creativecommons.org/licenses/by-nc/4.0/)
 
-## Features
+  <p align="center">
+    <b>Auto-Start Timer</b> • <b>Vibration Analysis</b> • <b>Hands-Free Operation</b><br>
+    <br>
+    <i>The official Espresso Shot Timer by Jan Hartje</i>
+  </p>
+</div>
 
-- **Auto-Start/Stop**: Sophisticated sensor logic detects pump vibration with customizable thresholds.
-- **Vibration Sensing**: Real-time visualizer of pump intensity and stability.
-- **Smart Smoothing**: Signal processing algorithms filter out accidental bumps and noise.
-- **Calibration Mode**: One-tap calibration to adapt to different machines and environments.
-- **Always-On Display**: Keeps your screen awake during usage.
-- **Premium Aesthetic**: Deep dark mode (#121212) with copper accents (#D4AF37) and glassmorphism UI.
+---
 
-## Tech Stack
+## ☕ Overview
 
-- **Framework**: React Native with Expo (Managed Workflow)
-- **Styling**: NativeWind (Tailwind CSS)
-- **Animations**: React Native Reanimated
-- **Sensors**: Expo Sensors (Accelerometer)
-- **Icons**: Lucide React Native
+**Espresso Shot Timer** transforms your smartphone into a precision coffee tool. By utilizing the device's accelerometer, it detects the subtle vibration signature of your espresso machine's pump, automatically starting and stopping the shot timer. 
 
-## Installation
+## 💻 Development
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/janhartje/espresso-shot-timer.git
-   cd espresso-shot-timer
-   ```
+### Prerequisites
+- **Node.js** (LTS recommended)
+- **Expo Go** app installed on your physical mobile device.
+- **Git**
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### Core Libraries
+- **React Native Reanimated**: For high-performance animations (60fps UI).
+- **NativeWind**: Tailwind CSS implementation for styling.
+- **Expo Sensors**: Access to accelerometer data.
 
-3. **Start the development server**
-   ```bash
-   npx expo start
-   ```
+### Project Structure
+```
+src/
+├── components/   # UI Building blocks (Timer, Visualizer, etc.)
+├── hooks/        # Core logic (useShotTimer.ts)
+└── assets/       # Images and Icons
+```
 
-## Usage
+### Contribution
 
-> **Note:** High-frequency sensor monitoring requires a physical device. This app will not function fully in a Simulator/Emulator.
+We welcome contributions! Please read our [Contribution Guidelines](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
-1. **Open the App**: Scan the QR code with Expo Go on your physical device.
-2. **Placement**: Place your phone on the drip tray or a flat, stable surface on top of your espresso machine.
-3. **Calibration**:
-   - Tap the **Settings** (Gear) icon.
-   - Wait 2 seconds while the app measures the baseline vibration of your machine/environment in an idle state.
-   - The threshold will automatically update.
-4. **Brew**: Start your espresso shot.
-   - The visualizer will react to the pump's vibration.
-   - The timer will start automatically when vibration exceeds the threshold.
-   - The timer will stop automatically when the pump stops (with a 1-second debounce to prevent false stops).
+1.  **Fork** the project.
+2.  **Create a Branch** (`git checkout -b feature/NewFeature`).
+3.  **Commit** (`git commit -m 'Add some NewFeature'`).
+4.  **Push** (`git push origin feature/NewFeature`).
+5.  **Open a Pull Request**.
 
-## Customization
+## ⚖️ License
 
-You can adjust sensor sensitivity settings in `src/hooks/useShotTimer.ts`:
-- `threshold`: Default trigger point (auto-adjusted by calibration).
-- `smoothingBufferSize`: Size of the rolling average window (default: 15).
-- `startDelay`: Time vibration must be sustained to start (default: 400ms).
-- `stopDelay`: Time vibration must be absent to stop (default: 1000ms).
+**Copyright © 2025 Jan Hartje. All Rights Reserved.**
 
-## License
+This project is made available under the **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** license.
 
-This project is open source and available under the [MIT License](LICENSE).
+This means you are welcome to:
+- **View the source code** to understand how it works.
+- **Contribute** fixes or new features (Pull Requests are welcome!).
+- **Fork** the repository for your own personal, non-commercial use.
+
+**However, you may NOT:**
+- Sell this app or a derivative of it.
+- Use the code for any commercial product or service without explicit permission from Jan Hartje.
+
+See the [LICENSE](LICENSE) file for the full legal text.
+
+---
+
+<div align="center">
+  Made with ☕ by Jan Hartje
+</div>

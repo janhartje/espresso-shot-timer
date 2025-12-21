@@ -1,7 +1,22 @@
 {
   "name": "espresso-shot-timer",
   "version": "1.0.0",
+  "description": "Precision espresso shot timer using accelerometer vibration detection.",
   "main": "index.js",
+  "author": "Jan Hartje <jan@hartje.de>",
+  "license": "CC-BY-NC-4.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/janhartje/espresso-shot-timer.git"
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "espresso",
+    "timer",
+    "coffee",
+    "accelerometer"
+  ],
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
