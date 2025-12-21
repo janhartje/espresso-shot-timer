@@ -9,6 +9,13 @@ jobs:
     type: build # This job type creates a production build for Android
     params:
       platform: android
+  submit_android:
+    name: Submit to Google Play Store
+    needs: [build_android]
+    type: submit
+    params:
+      platform: android
+      build_id: ${{ needs.build_android.outputs.build_id }}
   build_ios:
     type: build # This job type creates a production build for iOS
     params:
