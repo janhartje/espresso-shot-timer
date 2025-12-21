@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Accelerometer } from 'expo-sensors';
+import { storage } from '../utils/storage';
 import { useCalibration } from './useCalibration';
 import { calculateSD, getSensitivityMultiplier, SensitivityLevel } from '../utils/math';
 import { DebugLogger } from '../utils/logger';
@@ -12,6 +13,7 @@ interface UseShotTimerProps {
   startDelay?: number; 
   stopDelay?: number; 
   smoothingBufferSize?: number; 
+  ignoreSensors?: boolean;
 }
 
 export const useShotTimer = ({
@@ -19,6 +21,7 @@ export const useShotTimer = ({
   startDelay = 400,
   stopDelay = 200, 
   smoothingBufferSize = 50, 
+  ignoreSensors = false,
 }: UseShotTimerProps = {}) => {
   const [status, setStatus] = useState<ShotStatus>('IDLE');
   const statusRef = useRef<ShotStatus>('IDLE'); 
@@ -49,12 +52,47 @@ export const useShotTimer = ({
   const [debugMode, setDebugMode] = useState(false);
   const debugModeRef = useRef(false);
   
+  // Load persisted state
+  const [areSettingsLoaded, setAreSettingsLoaded] = useState(false);
+  useEffect(() => {
+      const loadState = async () => {
+          try {
+              const savedDebug = await storage.getDebugMode();
+              setDebugMode(savedDebug);
+
+              const savedLastShot = await storage.getLastShotTime();
+              if (savedLastShot !== null) {
+                  setLastShotTime(savedLastShot);
+              }
+
+              const savedBaseline = await storage.getCalibrationBaseline();
+              if (savedBaseline !== null) {
+                  setActiveVibrationLevel(savedBaseline);
+              }
+
+              const savedSensitivity = await storage.getCalibrationSensitivity();
+              if (savedSensitivity !== null) {
+                  setSensitivityLevel(savedSensitivity as SensitivityLevel);
+              }
+          } catch (e) {
+              console.error('Failed to load persisted state', e);
+          } finally {
+              setAreSettingsLoaded(true);
+          }
+      };
+      loadState();
+  }, []);
+
   useEffect(() => {
       debugModeRef.current = debugMode;
   }, [debugMode]);
 
-  const toggleDebugMode = useCallback(() => {
-      setDebugMode(prev => !prev);
+  const toggleDebugMode = useCallback(async () => {
+      setDebugMode(prev => {
+          const newState = !prev;
+          storage.setDebugMode(newState).catch(e => console.error(e));
+          return newState;
+      });
   }, []);
 
   // Initialize Logger
@@ -79,6 +117,8 @@ export const useShotTimer = ({
       onCalibrationComplete: (newLevel, newSensitivity) => {
           setActiveVibrationLevel(newLevel);
           setSensitivityLevel(newSensitivity);
+          storage.setCalibrationBaseline(newLevel).catch(e => console.error(e));
+          storage.setCalibrationSensitivity(newSensitivity).catch(e => console.error(e));
       }
   });
 
@@ -116,6 +156,7 @@ export const useShotTimer = ({
       
       setElapsedTime(finalTime);
       setLastShotTime(finalTime);
+      storage.setLastShotTime(finalTime).catch(e => console.error('Failed to save last shot', e));
     }
   }, []);
 
@@ -135,9 +176,11 @@ export const useShotTimer = ({
   }, [currentThreshold]);
 
   useEffect(() => {
-    _subscribe();
+    if (!ignoreSensors) {
+        _subscribe();
+    }
     return () => _unsubscribe();
-  }, [currentThreshold, isCalibrating]); 
+  }, [currentThreshold, isCalibrating, ignoreSensors]); 
 
   const _subscribe = () => {
     Accelerometer.setUpdateInterval(20); 
@@ -242,6 +285,7 @@ export const useShotTimer = ({
     sensitivityLevel,
     setSensitivityLevel,
     debugMode,
-    toggleDebugMode
+    toggleDebugMode,
+    areSettingsLoaded
   };
 };

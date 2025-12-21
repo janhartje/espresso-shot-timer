@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, ActivityIndicator, View } from 'react-native';
-import { Settings } from 'lucide-react-native';
+import { Activity } from 'lucide-react-native';
 import { GlassCard } from './GlassCard';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming } from 'react-native-reanimated';
 import i18n from '../i18n';
@@ -46,7 +46,7 @@ export const CalibrationCard: React.FC<CalibrationCardProps> = ({ onPress, isCal
                 {isCalibrating ? (
                     <ActivityIndicator color="#E6B778" size="large" />
                 ) : (
-                    <Settings size={32} color="#E6B778" strokeWidth={1.5} style={{ opacity: 0.9 }} /> 
+                    <Activity size={32} color="#E6B778" strokeWidth={1.5} style={{ opacity: 0.9 }} /> 
                 )}
                 
                 <Text 

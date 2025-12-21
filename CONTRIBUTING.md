@@ -44,6 +44,14 @@ npx expo start
 - **Tailwind**: Use `NativeWind` classes for styling. Try to avoid inline `style={{}}` unless necessary for animations.
 - **Clean Code**: Keep components small and focused.
 
+### Internationalization
+- **Strings**: All user-facing text must be externalized in `src/i18n/translations.ts`.
+- **Languages**: When adding new text, please provide translations for all supported languages if possible (`en`, `de`, `es`, `fr`, `pt`, `zh`, `ja`).
+
+### Persistence
+- **Centralized Storage**: All persistent data handling (AsyncStorage) is centralized in `src/utils/storage.ts`.
+- **Typing**: Do not call `AsyncStorage` directly. Use the typed methods in `storage` (e.g., `storage.getDebugMode()`) to ensure type safety and key consistency.
+
 ## ⚖️ License Agreement
 
 By contributing to this repository, you agree that your contributions will be licensed under the project's **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** license. You retain copyright of your contributions but grant Jan Hartje and the community the rights to use them under the terms of the project license.

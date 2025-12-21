@@ -41,7 +41,8 @@
 src/
 ├── components/   # UI Building blocks (Timer, Visualizer, etc.)
 ├── hooks/        # Core logic (useShotTimer, useCalibration)
-├── utils/        # Shared helpers (Math, Logger)
+├── i18n/         # Localization & Translations
+├── utils/        # Shared helpers (Math, Logger, Storage)
 └── assets/       # Images and Icons
 ```
 

@@ -14,6 +14,8 @@ import { TimerCard } from './src/components/TimerCard';
 import { StatCard } from './src/components/StatCard';
 import { GlassCard } from './src/components/GlassCard';
 import { CalibrationCard } from './src/components/CalibrationCard';
+import { OnboardingOverlay } from './src/components/OnboardingOverlay';
+import { storage } from './src/utils/storage';
 import i18n from './src/i18n';
 
 
@@ -24,6 +26,27 @@ export default function App() {
   React.useEffect(() => {
       console.log(`[Layout] Width: ${width}, Height: ${height}, Orientation: ${isLandscape ? 'LANDSCAPE' : 'PORTRAIT'}`);
   }, [width, height]);
+
+  // Onboarding State
+  const [showOnboarding, setShowOnboarding] = React.useState(false);
+  const [isOnboardingLoaded, setIsOnboardingLoaded] = React.useState(false);
+
+  const checkOnboarding = async () => {
+      try {
+          const hasSeen = await storage.getHasSeenOnboarding();
+          if (!hasSeen) {
+              setShowOnboarding(true);
+          }
+      } catch (error) {
+          console.error('Failed to check onboarding status:', error);
+      } finally {
+          setIsOnboardingLoaded(true);
+      }
+  };
+
+  React.useEffect(() => {
+    checkOnboarding();
+  }, []);
 
   const { 
     status, 
@@ -44,12 +67,17 @@ export default function App() {
     setSensitivityLevel,
     currentDeviation,
     debugMode,
-    toggleDebugMode
-  } = useShotTimer();
+    toggleDebugMode,
+    areSettingsLoaded
+  } = useShotTimer({ ignoreSensors: showOnboarding });
 
   // Debug Banner State
   const [showDebugBanner, setShowDebugBanner] = React.useState(false);
   const [debugBannerMessage, setDebugBannerMessage] = React.useState("");
+
+
+
+
 
   // Helper for Last Shot format
   const formatTimeSimple = (ms: number) => {
@@ -57,6 +85,17 @@ export default function App() {
     const milliseconds = Math.floor((ms % 1000) / 100);
     return `${totalSeconds}.${milliseconds}s`;
   };
+
+  const isAppReady = isOnboardingLoaded && areSettingsLoaded;
+
+  if (!isAppReady) {
+      return (
+          <View className="flex-1 bg-[#050505] items-center justify-center">
+              <StatusBar style="light" />
+              {/* Optional: Add a logo or spinner here */}
+          </View>
+      );
+  }
 
   return (
     <SafeAreaProvider>
@@ -83,6 +122,11 @@ export default function App() {
             onCancel={cancelCalibration} 
             timeLeft={calibrationTimeLeft} 
             isFinished={calibrationFinished}
+            />
+
+            <OnboardingOverlay 
+                isVisible={showOnboarding} 
+                onComplete={() => setShowOnboarding(false)} 
             />
 
             <View className="flex-1 p-3">
@@ -237,6 +281,26 @@ export default function App() {
                             {debugBannerMessage}
                         </Text>
                     </View>
+                </View>
+            )}
+
+            {/* Debug: Reset Onboarding Button */}
+            {debugMode && (
+                <View className="absolute bottom-8 left-0 right-0 items-center z-50">
+                    <TouchableOpacity 
+                        onPress={async () => {
+                            await storage.resetOnboarding();
+                            setShowOnboarding(true);
+                            setDebugBannerMessage("Onboarding Reset");
+                            setShowDebugBanner(true);
+                            setTimeout(() => setShowDebugBanner(false), 2000);
+                        }}
+                        className="bg-red-500/20 border border-red-500/50 px-4 py-2 rounded-full"
+                    >
+                        <Text className="text-red-400 font-medium text-xs uppercase tracking-wider">
+                            {i18n.t('resetOnboarding')}
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             )}
 
