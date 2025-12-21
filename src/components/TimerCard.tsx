@@ -43,11 +43,14 @@ export const TimerCard: React.FC<TimerCardProps> = ({
   const [dimensions, setDimensions] = React.useState({ width: 300, height: 300 });
   const [isLayoutReady, setIsLayoutReady] = React.useState(false);
   
-  // Shared values for animation
-  const progress = useSharedValue(0);
-  const mainText = useSharedValue("00");
-  const msText = useSharedValue(".00");
-  const lapIndexSv = useSharedValue(0);
+  // Shared values for animation - Initialize from props to avoid flash
+  const initialTotalSeconds = Math.floor(elapsedTime / 1000);
+  const initialMs = Math.floor((elapsedTime % 1000) / 10);
+  
+  const progress = useSharedValue((elapsedTime % 30000) / 30000);
+  const mainText = useSharedValue(initialTotalSeconds.toString().padStart(2, '0'));
+  const msText = useSharedValue(`.${initialMs.toString().padStart(2, '0')}`);
+  const lapIndexSv = useSharedValue(Math.floor(elapsedTime / 30000));
 
   // Sync shared values when props change (especially for stop/reset)
   useEffect(() => {
@@ -88,15 +91,12 @@ export const TimerCard: React.FC<TimerCardProps> = ({
   const animatedMainTextProps = useAnimatedProps(() => {
     return {
         text: mainText.value,
-        // defaultValue is required for TextInput but we rely on 'text' prop for updates
-        defaultValue: mainText.value, 
     } as any;
   });
 
   const animatedMsTextProps = useAnimatedProps(() => {
     return {
         text: msText.value,
-        defaultValue: msText.value,
     } as any;
   });
 
@@ -218,6 +218,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
                          <View className="flex-row items-baseline justify-center w-full px-4">
                             <AnimatedTextInput 
                                 animatedProps={animatedMainTextProps}
+                                defaultValue={Math.floor(elapsedTime / 1000).toString().padStart(2, '0')}
                                 className="text-white text-[100px] font-bold font-mono tracking-tighter shadow-lg leading-tight text-center p-0 m-0"
                                 style={{
                                     fontVariant: ['tabular-nums'],
@@ -231,6 +232,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
                             />
                              <AnimatedTextInput 
                                 animatedProps={animatedMsTextProps}
+                                defaultValue={`.${Math.floor((elapsedTime % 1000) / 10).toString().padStart(2, '0')}`}
                                 className="text-accent-copper text-[50px] font-mono font-medium opacity-80 leading-tight p-0 m-0"
                                 style={{
                                     fontVariant: ['tabular-nums'],
