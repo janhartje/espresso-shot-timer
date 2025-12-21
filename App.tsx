@@ -47,6 +47,7 @@ export default function App() {
           if (!hasSeen) {
               setShowOnboarding(true);
           }
+          console.log('[App] checkOnboarding - isSupporter:', supporterStatus);
           setIsSupporter(supporterStatus);
       } catch (error) {
           console.error('Failed to check onboarding status:', error);
@@ -196,6 +197,9 @@ export default function App() {
             <SupportOverlay
                 isVisible={showSupport}
                 onClose={() => setShowSupport(false)}
+                debugMode={debugMode}
+                onPurchaseComplete={() => setIsSupporter(true)}
+                isSupporter={isSupporter}
             />
 
             <View className="flex-1 p-3">
@@ -372,6 +376,9 @@ export default function App() {
                             {i18n.t('resetOnboarding')}
                         </Text>
                     </TouchableOpacity>
+                    <Text className="text-white/30 text-[10px] mt-2 font-mono">
+                        Supporter: {isSupporter ? "YES" : "NO"}
+                    </Text>
                 </View>
             )}
 

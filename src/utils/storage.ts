@@ -59,9 +59,11 @@ export const storage = {
   // Supporter Status
   async getIsSupporter(): Promise<boolean> {
     const value = await AsyncStorage.getItem(KEYS.IS_SUPPORTER);
+    console.log('[Storage] getIsSupporter:', value);
     return value === 'true';
   },
   async setIsSupporter(value: boolean): Promise<void> {
+    console.log('[Storage] setIsSupporter:', value);
     await AsyncStorage.setItem(KEYS.IS_SUPPORTER, String(value));
   },
 };

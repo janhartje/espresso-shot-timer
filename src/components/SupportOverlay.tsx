@@ -12,9 +12,12 @@ import { storage } from '../utils/storage';
 interface SupportOverlayProps {
     isVisible: boolean;
     onClose: () => void;
+    debugMode?: boolean;
+    onPurchaseComplete?: () => void;
+    isSupporter?: boolean;
 }
 
-export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClose }) => {
+export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClose, debugMode = false, onPurchaseComplete, isSupporter = false }) => {
     const insets = useSafeAreaInsets();
     const { width, height } = useWindowDimensions();
     const isLandscape = width > height;
@@ -29,8 +32,13 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
     useEffect(() => {
         if (isVisible) {
             loadOfferings();
+            if (isSupporter) {
+                setSuccessMessage(i18n.t('support.thankYouDesc'));
+            } else {
+                setSuccessMessage(null);
+            }
         }
-    }, [isVisible]);
+    }, [isVisible, isSupporter]);
 
     const loadOfferings = async () => {
         setLoading(true);
@@ -48,6 +56,7 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
             if (customerInfo) {
                 await storage.setIsSupporter(true);
                 setSuccessMessage(i18n.t('support.thankYouDesc'));
+                onPurchaseComplete?.();
             }
         } catch (e) {
             // Error handling is done in purchasePackage regarding user cancellation
@@ -72,6 +81,7 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
             if (customerInfo && customerInfo.activeSubscriptions.length > 0) {
                 await storage.setIsSupporter(true);
                 Alert.alert("Success", "Purchases restored successfully!");
+                onPurchaseComplete?.();
             } else {
                 Alert.alert("No Purchases", "No previous purchases found to restore.");
             }
@@ -95,11 +105,22 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
     const renderMainContent = () => {
         if (successMessage) {
             return (
-                <View className="items-center py-8 bg-green-500/10 rounded-2xl border border-green-500/20 mb-6">
-                    <CheckCircle size={48} color="#4ADE80" style={{ marginBottom: 16 }} />
-                    <Text className="text-neutral-900 dark:text-white text-xl font-bold mb-2">{i18n.t('support.thankYou')}</Text>
-                    <Text className="text-neutral-600 dark:text-white/70 text-center px-4">{successMessage}</Text>
-                </View>
+                <>
+                    <View className="items-center py-8 bg-green-500/10 rounded-2xl border border-green-500/20 mb-6">
+                        <CheckCircle size={48} color="#4ADE80" style={{ marginBottom: 16 }} />
+                        <Text className="text-neutral-900 dark:text-white text-xl font-bold mb-2">{i18n.t('support.thankYou')}</Text>
+                        <Text className="text-neutral-600 dark:text-white/70 text-center px-4">{successMessage}</Text>
+                    </View>
+
+                    <TouchableOpacity 
+                        onPress={() => setSuccessMessage(null)}
+                        className="bg-black/5 dark:bg-white/10 py-4 px-6 rounded-2xl items-center active:bg-black/10 dark:active:bg-white/20"
+                    >
+                        <Text className="text-neutral-900 dark:text-white font-bold text-base">
+                            {i18n.t('support.supportAgain')}
+                        </Text>
+                    </TouchableOpacity>
+                </>
             );
         }
 
@@ -155,6 +176,22 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                             No offerings found. Check configuration.
                         </Text>
                     </View>
+                )}
+                
+                {/* Debug: Simulate Purchase Button */}
+                {debugMode && (
+                    <TouchableOpacity 
+                        onPress={async () => {
+                            await storage.setIsSupporter(true);
+                            setSuccessMessage("Debug: Supporter status set via Simulate.");
+                            onPurchaseComplete?.();
+                        }}
+                        className="mt-4 bg-red-500/10 border border-red-500/30 p-4 rounded-2xl items-center"
+                    >
+                        <Text className="text-red-500 font-bold">
+                            [DEBUG] Simulate Purchase
+                        </Text>
+                    </TouchableOpacity>
                 )}
             </View>
         );

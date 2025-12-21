@@ -34,12 +34,16 @@ export const translations = {
       restore: "Restore Purchases",
       thankYou: "Thank You!",
       thankYouDesc: "Your support means the world to me and helps keep the app ad-free and updated.",
-      close: "Close"
+      close: "Close",
+      supportAgain: "Send another tip"
     },
       products: {
       tip_small: { title: "Small Tip", description: "Buy me a coffee ☕" },
       tip_medium: { title: "Medium Tip", description: "A delicious pastry 🥐" },
       tip_large: { title: "Large Tip", description: "A quick lunch 🥪" },
+      tip_small_v2: { title: "Small Tip", description: "Buy me a coffee ☕" },
+      tip_medium_v2: { title: "Medium Tip", description: "A delicious pastry 🥐" },
+      tip_large_v2: { title: "Large Tip", description: "A quick lunch 🥪" },
       reconcuring_tip: { title: "Monthly Support", description: "Join the supporter club! 🌟" },
     },
     onboarding: {
@@ -113,12 +117,16 @@ export const translations = {
       restore: "Käufe wiederherstellen",
       thankYou: "Dankeschön!",
       thankYouDesc: "Deine Unterstützung bedeutet mir sehr viel und hilft, die App werbefrei und aktuell zu halten.",
-      close: "Schließen"
+      close: "Schließen",
+      supportAgain: "Nochmals unterstützen"
     },
     products: {
       tip_small: { title: "Kleines Trinkgeld", description: "Spendier mir einen Kaffee ☕" },
       tip_medium: { title: "Mittleres Trinkgeld", description: "Ein leckeres Teilchen 🥐" },
       tip_large: { title: "Großes Trinkgeld", description: "Ein schnelles Mittagessen 🥪" },
+      tip_small_v2: { title: "Kleines Trinkgeld", description: "Spendier mir einen Kaffee ☕" },
+      tip_medium_v2: { title: "Mittleres Trinkgeld", description: "Ein leckeres Teilchen 🥐" },
+      tip_large_v2: { title: "Großes Trinkgeld", description: "Ein schnelles Mittagessen 🥪" },
       reconcuring_tip: { title: "Monatliche Unterstützung", description: "Werde Teil des Club! 🌟" },
     },
     onboarding: {
@@ -184,10 +192,24 @@ export const translations = {
     openSource: "Licencias de Código Abierto",
     contact: "Contacto",
     legal: "Legal",
+    support: {
+        title: "Apoyar el desarrollo",
+        description: "Si te gusta Espresso Shot Timer, considera apoyar su desarrollo. Estas son propinas opcionales y no desbloquean funciones adicionales.",
+        oneTime: "Propina única",
+        monthly: "Apoyo mensual",
+        restore: "Restaurar compras",
+        thankYou: "¡Gracias!",
+        thankYouDesc: "Tu apoyo significa mucho para mí y ayuda a mantener la aplicación sin anuncios y actualizada.",
+        close: "Cerrar",
+        supportAgain: "Enviar otra propina"
+    },
     products: {
         tip_small: { title: "Propina Pequeña", description: "Cómprame un café ☕" },
         tip_medium: { title: "Propina Mediana", description: "Un pastel delicioso 🥐" },
         tip_large: { title: "Propina Grande", description: "Un almuerzo rápido 🥪" },
+        tip_small_v2: { title: "Propina Pequeña", description: "Cómprame un café ☕" },
+        tip_medium_v2: { title: "Propina Mediana", description: "Un pastel delicioso 🥐" },
+        tip_large_v2: { title: "Propina Grande", description: "Un almuerzo rápido 🥪" },
         reconcuring_tip: { title: "Apoyo Mensual", description: "¡Únete al club! 🌟" },
     },
     onboarding: {
@@ -253,10 +275,24 @@ export const translations = {
     openSource: "Licences Open Source",
     contact: "Contact",
     legal: "Légal",
+    support: {
+        title: "Soutenir le développement",
+        description: "Si vous aimez Espresso Shot Timer, envisagez de soutenir son développement. Ce sont des pourboires optionnels qui ne débloquent pas de fonctionnalités supplémentaires.",
+        oneTime: "Pourboire unique",
+        monthly: "Soutien mensuel",
+        restore: "Restaurer les achats",
+        thankYou: "Merci !",
+        thankYouDesc: "Votre soutien compte beaucoup pour moi et aide à garder l'application sans publicité et à jour.",
+        close: "Fermer",
+        supportAgain: "Envoyer un autre pourboire"
+    },
     products: {
         tip_small: { title: "Petit Pourboire", description: "Offrez-moi un café ☕" },
         tip_medium: { title: "Pourboire Moyen", description: "Une délicieuse pâtisserie 🥐" },
         tip_large: { title: "Grand Pourboire", description: "Un déjeuner rapide 🥪" },
+        tip_small_v2: { title: "Petit Pourboire", description: "Offrez-moi un café ☕" },
+        tip_medium_v2: { title: "Pourboire Moyen", description: "Une délicieuse pâtisserie 🥐" },
+        tip_large_v2: { title: "Grand Pourboire", description: "Un déjeuner rapide 🥪" },
         reconcuring_tip: { title: "Soutien Mensuel", description: "Rejoignez le club ! 🌟" },
     },
     onboarding: {
@@ -321,10 +357,24 @@ export const translations = {
     openSource: "Licenças de Código Aberto",
     contact: "Contato",
     legal: "Legal",
+    support: {
+        title: "Apoiar o desenvolvimento",
+        description: "Se você gosta do Espresso Shot Timer, considere apoiar seu desenvolvimento. Essas são gorjetas opcionais e não desbloqueiam recursos extras.",
+        oneTime: "Gorjeta única",
+        monthly: "Apoio mensal",
+        restore: "Restaurar compras",
+        thankYou: "Obrigado!",
+        thankYouDesc: "Seu apoio significa muito para mim e ajuda a manter o aplicativo sem anúncios e atualizado.",
+        close: "Fechar",
+        supportAgain: "Enviar outra gorjeta"
+    },
     products: {
         tip_small: { title: "Pequena Gorjeta", description: "Pague-me um café ☕" },
         tip_medium: { title: "Gorjeta Média", description: "Um pastel delicioso 🥐" },
         tip_large: { title: "Grande Gorjeta", description: "Um almoço rápido 🥪" },
+        tip_small_v2: { title: "Pequena Gorjeta", description: "Pague-me um café ☕" },
+        tip_medium_v2: { title: "Gorjeta Média", description: "Um pastel delicioso 🥐" },
+        tip_large_v2: { title: "Grande Gorjeta", description: "Um almoço rápido 🥪" },
         reconcuring_tip: { title: "Apoio Mensal", description: "Junte-se ao clube! 🌟" },
     },
     onboarding: {
@@ -390,10 +440,24 @@ export const translations = {
     openSource: "开源许可",
     contact: "联系我们",
     legal: "法律信息",
+    support: {
+        title: "支持开发",
+        description: "如果您喜欢 Espresso Shot Timer，请考虑支持其开发。这些是可选的小费，不会解锁额外功能。",
+        oneTime: "一次性小费",
+        monthly: "月度支持",
+        restore: "恢复购买",
+        thankYou: "谢谢！",
+        thankYouDesc: "您的支持对我意义重大，有助于保持应用无广告并持续更新。",
+        close: "关闭",
+        supportAgain: "再次支持"
+    },
     products: {
         tip_small: { title: "小费", description: "请我喝杯咖啡 ☕" },
         tip_medium: { title: "中费", description: "美味的糕点 🥐" },
         tip_large: { title: "大费", description: "简单的午餐 🥪" },
+        tip_small_v2: { title: "小费", description: "请我喝杯咖啡 ☕" },
+        tip_medium_v2: { title: "中费", description: "美味的糕点 🥐" },
+        tip_large_v2: { title: "大费", description: "简单的午餐 🥪" },
         reconcuring_tip: { title: "月度支持", description: "加入支持者俱乐部！ 🌟" },
     },
     onboarding: {
@@ -459,10 +523,24 @@ export const translations = {
     openSource: "オープンソースライセンス",
     contact: "お問い合わせ",
     legal: "法的情報",
+    support: {
+        title: "開発を支援",
+        description: "Espresso Shot Timerを気に入っていただけましたら、開発の支援をご検討ください。これらは任意のチップであり、機能のロック解除はありません。",
+        oneTime: "一度きりのチップ",
+        monthly: "毎月のサポート",
+        restore: "購入を復元",
+        thankYou: "ありがとうございます！",
+        thankYouDesc: "あなたのサポートは私にとって非常に重要であり、アプリを広告なしで更新し続けるのに役立ちます。",
+        close: "閉じる",
+        supportAgain: "もう一度サポートする"
+    },
     products: {
         tip_small: { title: "小さなチップ", description: "コーヒーを一杯 ☕" },
         tip_medium: { title: "中くらいのチップ", description: "美味しいパン 🥐" },
         tip_large: { title: "大きなチップ", description: "クイックランチ 🥪" },
+        tip_small_v2: { title: "小さなチップ", description: "コーヒーを一杯 ☕" },
+        tip_medium_v2: { title: "中くらいのチップ", description: "美味しいパン 🥐" },
+        tip_large_v2: { title: "大きなチップ", description: "クイックランチ 🥪" },
         reconcuring_tip: { title: "毎月のサポート", description: "サポータークラブに参加！ 🌟" },
     },
     onboarding: {
