@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, withRepeat, withSequence, Easing } from 'react-native-reanimated';
 import { GlassCard } from './GlassCard';
+import i18n from '../i18n';
 
 interface VisualizerProps {
   magnitude: number;
@@ -76,7 +77,7 @@ export const Visualizer: React.FC<VisualizerProps> = ({ magnitude, isActive, cla
   return (
     <GlassCard className={`justify-between ${className}`} contentClassName="p-0">
         <View className="absolute top-5 left-5 z-20">
-             <Text className="text-zinc-400 text-lg font-normal tracking-wide opacity-90">Vibration</Text>
+             <Text className="text-zinc-400 text-lg font-normal tracking-wide opacity-90">{i18n.t('vibration')}</Text>
         </View>
         
         <View className="flex-1 flex-row items-center justify-center h-full w-full pt-10 px-4 gap-[3px]">

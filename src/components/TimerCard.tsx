@@ -6,6 +6,8 @@ import Animated, { useSharedValue, useAnimatedProps, withTiming, Easing } from '
 import { ShotStatus } from '../hooks/useShotTimer';
 import { GlassCard } from './GlassCard';
 
+import i18n from '../i18n';
+
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const { width } = Dimensions.get('window');
 const RADIUS = 110; 
@@ -108,7 +110,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
     >
         {/* Header - Top Left Absolute */}
         <View className="absolute top-5 left-5 z-20">
-            <Text className="text-zinc-400 text-lg font-normal tracking-wide opacity-90">Timer</Text>
+            <Text className="text-zinc-400 text-lg font-normal tracking-wide opacity-90">{i18n.t('timer')}</Text>
         </View>
 
         {/* Ring Container - Fills space */}

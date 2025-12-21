@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-nati
 import { BlurView } from 'expo-blur';
 import { Activity, CheckCircle, X } from 'lucide-react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import i18n from '../i18n';
 
 
 import { Platform } from 'react-native';
@@ -40,14 +41,14 @@ export const CalibrationOverlay: React.FC<CalibrationOverlayProps> = ({
         {isFinished ? (
             <View className="items-center gap-4">
                 <CheckCircle size={80} color="#4ade80" />
-                <Text className="text-white text-3xl font-bold">Calibrated!</Text>
+                <Text className="text-white text-3xl font-bold">{i18n.t('calibrated')}</Text>
                 <Text className="text-white/60 text-center mb-8">
-                    Your machine's vibration profile has been saved.
+                    {i18n.t('calibrationSaved')}
                 </Text>
             </View>
         ) : (
             <View className="items-center gap-6">
-                <Text className="text-accent-copper text-sm uppercase tracking-widest">Calibration Mode</Text>
+                <Text className="text-accent-copper text-sm uppercase tracking-widest">{i18n.t('calibrationMode')}</Text>
                 
                 <View className="w-48 h-48 rounded-full border-4 border-accent-copper items-center justify-center bg-white/5">
                     <Text className="text-8xl font-black text-white tabular-nums">
@@ -57,16 +58,16 @@ export const CalibrationOverlay: React.FC<CalibrationOverlayProps> = ({
 
                 <View className="h-24 justify-center">
                     {timeLeft > 2 ? (
-                        <Text key="start-msg" className="text-white text-xl font-bold text-center">Start your machine!</Text>
+                        <Text key="start-msg" className="text-white text-xl font-bold text-center">{i18n.t('startMachine')}</Text>
                     ) : timeLeft > 0 ? (
-                        <Text key="measuring-msg" className="text-white/70 text-lg text-center animate-pulse">Measuring...</Text>
+                        <Text key="measuring-msg" className="text-white/70 text-lg text-center animate-pulse">{i18n.t('measuring')}</Text>
                     ) : (
                         <Activity key="activity" size={32} color="#D4AF37" />
                     )}
                 </View>
                 
                 <Text className="text-white/30 text-xs text-center max-w-[200px]">
-                    Place cup on scale/tray as usual. Keep phone steady.
+                    {i18n.t('calibrationInstructions')}
                 </Text>
             </View>
         )}
@@ -77,7 +78,7 @@ export const CalibrationOverlay: React.FC<CalibrationOverlayProps> = ({
                 onPress={onCancel}
                 className="mt-12 bg-white/10 px-8 py-3 rounded-full"
             >
-                <Text className="text-white font-medium">Cancel</Text>
+                <Text className="text-white font-medium">{i18n.t('cancel')}</Text>
             </TouchableOpacity>
         )}
       </View>

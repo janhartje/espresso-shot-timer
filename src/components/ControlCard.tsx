@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Text } from 'react-native';
 import { Play, Square, RotateCcw, Settings } from 'lucide-react-native';
 import { GlassCard } from './GlassCard';
 import { ShotStatus } from '../hooks/useShotTimer';
+import i18n from '../i18n';
 
 interface ControlCardProps {
   status: ShotStatus;
@@ -30,7 +31,7 @@ export const ControlCard: React.FC<ControlCardProps> = ({
                 className="flex-1 bg-red-500/20 h-12 rounded-full items-center justify-center border border-red-500/30 flex-row gap-2 active:bg-red-500/30"
             >
                 <Square size={18} color="#ef4444" fill="#ef4444" fillOpacity={0.5} />
-                <Text className="text-red-400 font-bold uppercase tracking-wide text-xs">Stop</Text>
+                <Text className="text-red-400 font-bold uppercase tracking-wide text-xs">{i18n.t('stop')}</Text>
             </TouchableOpacity>
         ) : (
             <TouchableOpacity 
@@ -38,7 +39,7 @@ export const ControlCard: React.FC<ControlCardProps> = ({
                 className="flex-1 bg-accent-copper/20 h-12 rounded-full items-center justify-center border border-accent-copper/30 flex-row gap-2 active:bg-accent-copper/30"
             >
                 <Play size={18} color="#D4AF37" fill="#D4AF37" fillOpacity={0.5} />
-                <Text className="text-accent-copper font-bold uppercase tracking-wide text-xs">Start</Text>
+                <Text className="text-accent-copper font-bold uppercase tracking-wide text-xs">{i18n.t('start')}</Text>
             </TouchableOpacity>
         )}
 

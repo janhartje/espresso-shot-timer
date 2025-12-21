@@ -14,6 +14,7 @@ import { TimerCard } from './src/components/TimerCard';
 import { StatCard } from './src/components/StatCard';
 import { GlassCard } from './src/components/GlassCard';
 import { CalibrationCard } from './src/components/CalibrationCard';
+import i18n from './src/i18n';
 
 
 export default function App() {
@@ -106,7 +107,7 @@ export default function App() {
                                     onToggleDebug={() => {
                                         toggleDebugMode();
                                         const newMode = !debugMode;
-                                        setDebugBannerMessage(`Debug Mode: ${newMode ? "ON" : "OFF"}`);
+                                        setDebugBannerMessage(newMode ? i18n.t('debugModeOn') : i18n.t('debugModeOff'));
                                         setShowDebugBanner(true);
                                         setTimeout(() => setShowDebugBanner(false), 2500);
                                     }}
@@ -137,7 +138,7 @@ export default function App() {
                             <View className="flex-1 w-full shadow-lg shadow-black/50">
                                 <View className="flex-1 rounded-[32px] overflow-hidden">
                                     <StatCard 
-                                        label="Last Shot:" 
+                                        label={i18n.t('lastShot')} 
                                         value={lastShotTime ? formatTimeSimple(lastShotTime) : '--'} 
                                         className="flex-1 w-full"
                                     />
@@ -204,7 +205,7 @@ export default function App() {
                             <View className="flex-1 shadow-lg shadow-black/50">
                                 <View className="flex-1 rounded-[32px] overflow-hidden">
                                     <StatCard 
-                                        label="Last Shot:" 
+                                        label={i18n.t('lastShot')} 
                                         value={lastShotTime ? formatTimeSimple(lastShotTime) : '--'} 
                                         className="flex-1"
                                     />
@@ -231,7 +232,7 @@ export default function App() {
             {showDebugBanner && (
                 <View className="absolute top-12 left-0 right-0 items-center z-50 pointer-events-none">
                     <View className="bg-black/80 border border-white/10 px-6 py-3 rounded-full flex-row items-center gap-2 shadow-xl shadow-black">
-                        <View className={`w-2 h-2 rounded-full ${debugBannerMessage.includes("ON") ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`} />
+                        <View className={`w-2 h-2 rounded-full ${debugBannerMessage.includes("ON") || debugBannerMessage.includes("AN") ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`} />
                         <Text className="text-white font-medium tracking-wide text-sm">
                             {debugBannerMessage}
                         </Text>

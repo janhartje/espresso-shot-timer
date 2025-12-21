@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, ActivityIndicator, View } from 'react-native';
 import { Settings } from 'lucide-react-native';
 import { GlassCard } from './GlassCard';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming } from 'react-native-reanimated';
+import i18n from '../i18n';
 
 interface CalibrationCardProps {
   onPress: () => void;
@@ -53,7 +54,7 @@ export const CalibrationCard: React.FC<CalibrationCardProps> = ({ onPress, isCal
                     adjustsFontSizeToFit
                     numberOfLines={1}
                 >
-                    {isCalibrating ? 'Calibrating...' : 'Calibrate'}
+                    {isCalibrating ? i18n.t('calibrating') : i18n.t('calibrate')}
                 </Text>
             </View>
         </GlassCard>
