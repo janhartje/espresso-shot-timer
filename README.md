@@ -40,7 +40,8 @@
 ```
 src/
 ├── components/   # UI Building blocks (Timer, Visualizer, etc.)
-├── hooks/        # Core logic (useShotTimer.ts)
+├── hooks/        # Core logic (useShotTimer, useCalibration)
+├── utils/        # Shared helpers (Math, Logger)
 └── assets/       # Images and Icons
 ```
 
