@@ -25,10 +25,18 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.janhartje.espressoshottimer"
+      "bundleIdentifier": "com.janhartje.espressoshottimer",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "plugins": [
       "expo-localization"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "51f58e15-5883-4bb1-85ec-75cf3c2474bb"
+      }
+    }
   }
 }

@@ -128,15 +128,9 @@ export const useShotTimer = ({
     setStatus('BREWING');
     startTimeRef.current = Date.now();
     
+    // Clear any existing interval just in case
     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current as NodeJS.Timeout);
-    
-    timerIntervalRef.current = setInterval(() => {
-        if (startTimeRef.current) {
-          const now = Date.now();
-          const elapsed = now - (startTimeRef.current as number);
-          setElapsedTime(elapsed);
-        }
-    }, 16); 
+    timerIntervalRef.current = null;
   }, [logger]);
 
   const stopTimer = useCallback((endTimeOverride?: number) => {
@@ -269,6 +263,7 @@ export const useShotTimer = ({
   return {
     status,
     elapsedTime,
+    startTime: startTimeRef.current,
     currentMagnitude,
     currentDeviation, 
     lastShotTime,

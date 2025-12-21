@@ -52,7 +52,8 @@ export default function App() {
 
   const { 
     status, 
-    elapsedTime, 
+    elapsedTime,
+    startTime, 
     currentMagnitude, 
     lastShotTime, 
     startTimer, 
@@ -174,6 +175,7 @@ export default function App() {
                             <View className="flex-1 rounded-[32px] overflow-hidden">
                                 <TimerCard 
                                     elapsedTime={elapsedTime} 
+                                    startTime={startTime}
                                     status={status} 
                                     isCalibrating={isCalibrating}
                                     onStart={startTimer}
@@ -241,6 +243,7 @@ export default function App() {
                             <View className="flex-1 rounded-[32px] overflow-hidden">
                                 <TimerCard 
                                     elapsedTime={elapsedTime} 
+                                    startTime={startTime}
                                     status={status} 
                                     isCalibrating={isCalibrating}
                                     onStart={startTimer}

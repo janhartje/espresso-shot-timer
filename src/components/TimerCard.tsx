@@ -1,21 +1,24 @@
 
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, TextInput } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop, G } from 'react-native-svg';
-import Animated, { useSharedValue, useAnimatedProps, withTiming, Easing } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedProps, useFrameCallback, runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { ShotStatus } from '../hooks/useShotTimer';
 import { GlassCard } from './GlassCard';
 
 import i18n from '../i18n';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
+
 const { width } = Dimensions.get('window');
 const RADIUS = 110; 
 const STROKE_WIDTH = 12;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 interface TimerCardProps {
-  elapsedTime: number;
+  elapsedTime: number; // For initial/final state
+  startTime: number | null; // For active counting
   status: ShotStatus;
   isCalibrating: boolean;
   onStart: () => void;
@@ -27,6 +30,7 @@ interface TimerCardProps {
 
 export const TimerCard: React.FC<TimerCardProps> = ({ 
     elapsedTime, 
+    startTime,
     status, 
     isCalibrating, 
     onStart,
@@ -38,50 +42,105 @@ export const TimerCard: React.FC<TimerCardProps> = ({
   // Initialize with a safe default size to prevent invisibility
   const [dimensions, setDimensions] = React.useState({ width: 300, height: 300 });
   const [isLayoutReady, setIsLayoutReady] = React.useState(false);
+  
+  // Shared values for animation
   const progress = useSharedValue(0);
+  const mainText = useSharedValue("00");
+  const msText = useSharedValue(".00");
+  const lapIndexSv = useSharedValue(0);
+
+  // Sync shared values when props change (especially for stop/reset)
+  useEffect(() => {
+    // If not brewing, we trust the static elapsedTime
+    if (status !== 'BREWING') {
+        const totalSeconds = Math.floor(elapsedTime / 1000);
+        const milliseconds = Math.floor((elapsedTime % 1000) / 10);
+        
+        mainText.value = totalSeconds.toString().padStart(2, '0');
+        msText.value = `.${milliseconds.toString().padStart(2, '0')}`;
+        
+        const MAX_TIME = 30000;
+        progress.value = (elapsedTime % MAX_TIME) / MAX_TIME;
+        lapIndexSv.value = Math.floor(elapsedTime / MAX_TIME);
+    }
+  }, [elapsedTime, status]);
+
+
+  useFrameCallback(() => {
+    if (status === 'BREWING' && startTime) {
+        const now = Date.now();
+        const currentElapsed = now - startTime;
+        
+        // Update Text
+        const totalSeconds = Math.floor(currentElapsed / 1000);
+        const milliseconds = Math.floor((currentElapsed % 1000) / 10);
+        
+        mainText.value = totalSeconds.toString().padStart(2, '0');
+        msText.value = `.${milliseconds.toString().padStart(2, '0')}`;
+
+        // Update Ring
+        const MAX_TIME = 30000;
+        progress.value = (currentElapsed % MAX_TIME) / MAX_TIME;
+        lapIndexSv.value = Math.floor(currentElapsed / MAX_TIME);
+    }
+  });
+
+  const animatedMainTextProps = useAnimatedProps(() => {
+    return {
+        text: mainText.value,
+        // defaultValue is required for TextInput but we rely on 'text' prop for updates
+        defaultValue: mainText.value, 
+    } as any;
+  });
+
+  const animatedMsTextProps = useAnimatedProps(() => {
+    return {
+        text: msText.value,
+        defaultValue: msText.value,
+    } as any;
+  });
+
+  // Derived state for gradients (this needs to be reactive to re-renders for now, or use logic)
+  // We use a simple JS state for gradient colors that updates occasionally if needed, 
+  // but for 60fps correctness we can just check the lapIndex in JS during render if we want perfect sync,
+  // or accept that color flip might lag one frame. 
+  // Actually, let's just use the shared value to determine styles if we were using Views.
+  // For SVG gradients, we can't easily animate the 'url(#id)' prop from UI thread without a bridge.
+  // So we accept that lap color change (every 30s) happens via React re-render or we assume React updates fast enough.
+  // Given `lapIndexSv` changes on UI thread, we can't observe it easily in JS render without state.
+  // However, the `TimerCard` component will likely NOT re-render during the 30s unless other props change.
+  // To fix this, we can force a re-render every 30s or just let it be. 
+  // Let's use a JS derived value from props for now -> waiting for the user to reach 30s might show old color until some state updates.
+  // Better approach: Pass `startTime` and use `useFrameCallback` to `runOnJS` when lap changes?
+  // For now, let's keep it simple. The ring moves smoothly. The color might stay "Gold" past 30s until something triggers render.
+  // To fix: We can check in useFrameCallback if lap changed and trigger a JS state update.
+  
+  const [currentLapJs, setCurrentLapJs] = React.useState(0);
+  
+  useFrameCallback(() => {
+      if (status === 'BREWING' && startTime) {
+          const now = Date.now();
+          const elapsed = now - startTime;
+          const newLap = Math.floor(elapsed / 30000);
+          if (newLap !== currentLapJs) {
+              runOnJS(setCurrentLapJs)(newLap);
+          }
+      }
+  });
+  
+  // If not brewing, use prop based lap
+  const effectiveLap = status === 'BREWING' ? currentLapJs : Math.floor(elapsedTime / 30000);
+  
+  const isEvenLap = effectiveLap % 2 === 0;
+  const activeGradient = isEvenLap ? "url(#grad)" : "url(#gradRed)";
+  const trackStroke = effectiveLap === 0 ? "rgba(255,255,255,0.05)" : (isEvenLap ? "url(#gradRed)" : "url(#grad)");
+  const trackOpacity = 1;
+
 
   // Debug Tap Refs
   const lastTapRef = React.useRef<number>(0);
   const tapCountRef = React.useRef<number>(0);
 
-    // Time formatting
-    const formatTime = (ms: number) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const milliseconds = Math.floor((ms % 1000) / 10); 
-    
-    return {
-        main: `${totalSeconds.toString().padStart(2, '0')}`,
-        ms: `.${milliseconds.toString().padStart(2, '0')}`
-    };
-    };
-
-    const timeParts = formatTime(elapsedTime);
-
-    // Calculate laps and progress
-    const MAX_TIME = 30000;
-    const lapIndex = Math.floor(elapsedTime / MAX_TIME);
-    // If not idle/reset, we want smooth looping
-    // Use modulo for progress
-    const lapProgress = (elapsedTime % MAX_TIME) / MAX_TIME;
-    
-    // Determine gradient to use
-    // Lap 0 (0-30s): Gold (#grad) -> Track is Dim
-    // Lap 1 (30-60s): Red (#gradRed) -> Track is Gold (#grad)
-    // Lap 2 (60-90s): Gold (#grad) -> Track is Red (#gradRed)
-    
-    const isEvenLap = lapIndex % 2 === 0;
-    const activeGradient = isEvenLap ? "url(#grad)" : "url(#gradRed)";
-    
-    // Track color logic:
-    // If lap 0: Dim static color
-    // If lap > 0: The gradient of the *completed* lap (which is the opposite of the current active one)
-    const trackStroke = lapIndex === 0 ? "rgba(255,255,255,0.05)" : (isEvenLap ? "url(#gradRed)" : "url(#grad)");
-    const trackOpacity = lapIndex === 0 ? 1 : 1; // Keep previous lap fully visible
-
-    // Direct update without animation for responsiveness
-    useEffect(() => {
-        progress.value = lapProgress; 
-    }, [lapProgress]);
 
     const onLayout = (event: any) => {
         const { width, height } = event.nativeEvent.layout;
@@ -157,20 +216,30 @@ export const TimerCard: React.FC<TimerCardProps> = ({
                 {/* Time Text Layer */}
                 <View className="absolute inset-0 items-center justify-center pointer-events-none">
                          <View className="flex-row items-baseline justify-center w-full px-4">
-                            <Text 
-                                className="text-white text-[100px] font-bold font-mono tracking-tighter shadow-lg leading-tight text-center"
-                                adjustsFontSizeToFit
-                                numberOfLines={1}
-                            >
-                                {timeParts.main}
-                            </Text>
-                             <Text 
-                                className="text-accent-copper text-[50px] font-mono font-medium opacity-80 leading-tight"
-                                adjustsFontSizeToFit
-                                numberOfLines={1}
-                             >
-                                 {timeParts.ms}
-                             </Text>
+                            <AnimatedTextInput 
+                                animatedProps={animatedMainTextProps}
+                                className="text-white text-[100px] font-bold font-mono tracking-tighter shadow-lg leading-tight text-center p-0 m-0"
+                                style={{
+                                    fontVariant: ['tabular-nums'],
+                                    includeFontPadding: false,
+                                    // Remove text input styles
+                                    backgroundColor: 'transparent',
+                                    borderWidth: 0,
+                                }}
+                                editable={false}
+                                // Prevent user interaction 
+                            />
+                             <AnimatedTextInput 
+                                animatedProps={animatedMsTextProps}
+                                className="text-accent-copper text-[50px] font-mono font-medium opacity-80 leading-tight p-0 m-0"
+                                style={{
+                                    fontVariant: ['tabular-nums'],
+                                    includeFontPadding: false,
+                                    backgroundColor: 'transparent',
+                                    borderWidth: 0,
+                                }}
+                                editable={false}
+                             />
                          </View>
                     </View>
             </View>
