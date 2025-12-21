@@ -16,19 +16,21 @@ import { GlassCard } from './src/components/GlassCard';
 import { CalibrationCard } from './src/components/CalibrationCard';
 import { OnboardingOverlay } from './src/components/OnboardingOverlay';
 import { storage } from './src/utils/storage';
+import { DebugLogger } from './src/utils/logger';
 import i18n from './src/i18n';
+import { Header } from './src/components/Header';
+import { InfoOverlay } from './src/components/InfoOverlay';
 
 
 export default function App() {
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
 
-  React.useEffect(() => {
-      console.log(`[Layout] Width: ${width}, Height: ${height}, Orientation: ${isLandscape ? 'LANDSCAPE' : 'PORTRAIT'}`);
-  }, [width, height]);
 
-  // Onboarding State
+
+  // Onboarding & Info State
   const [showOnboarding, setShowOnboarding] = React.useState(false);
+  const [showInfo, setShowInfo] = React.useState(false);
   const [isOnboardingLoaded, setIsOnboardingLoaded] = React.useState(false);
 
   const checkOnboarding = async () => {
@@ -71,12 +73,29 @@ export default function App() {
     areSettingsLoaded
   } = useShotTimer({ ignoreSensors: showOnboarding });
 
+  // Stop timer when Info overlay opens
+  React.useEffect(() => {
+    if (showInfo && status === 'BREWING') {
+      stopTimer();
+    }
+  }, [showInfo, status, stopTimer]);
+
+  // Stop timer when Calibration overlay opens
+  React.useEffect(() => {
+    if (isCalibrating && status === 'BREWING') {
+      stopTimer();
+    }
+  }, [isCalibrating, status, stopTimer]);
+
   // Debug Banner State
   const [showDebugBanner, setShowDebugBanner] = React.useState(false);
   const [debugBannerMessage, setDebugBannerMessage] = React.useState("");
 
-
-
+  // Debug Logger
+  const debugModeRef = React.useRef(debugMode);
+  React.useEffect(() => { debugModeRef.current = debugMode; }, [debugMode]);
+  const loggerRef = React.useRef(new DebugLogger(debugModeRef));
+  const logger = loggerRef.current;
 
 
   // Helper for Last Shot format
@@ -117,6 +136,8 @@ export default function App() {
             </Svg>
             </View>
             
+            <Header onInfoPress={() => setShowInfo(true)} />
+
             <CalibrationOverlay 
             isVisible={isCalibrating} 
             onCancel={cancelCalibration} 
@@ -127,6 +148,16 @@ export default function App() {
             <OnboardingOverlay 
                 isVisible={showOnboarding} 
                 onComplete={() => setShowOnboarding(false)} 
+            />
+
+            <InfoOverlay 
+                isVisible={showInfo} 
+                onClose={() => setShowInfo(false)}
+                onResetOnboarding={async () => {
+                    await storage.resetOnboarding();
+                    setShowOnboarding(true);
+                    setShowInfo(false);
+                }}
             />
 
             <View className="flex-1 p-3">
