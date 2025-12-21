@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 import { storage } from '../utils/storage';
 import { useCalibration } from './useCalibration';
@@ -259,6 +260,32 @@ export const useShotTimer = ({
     subscriptionRef.current && subscriptionRef.current.remove();
     subscriptionRef.current = null;
   };
+
+  // AppState Handling
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+        if (nextAppState === 'background' || nextAppState === 'inactive') {
+            logger.log('[AppState] App going to background/inactive. Stopping sensors.');
+            _unsubscribe();
+            
+            if (statusRef.current === 'BREWING') {
+                logger.log('[AppState] Timer was running. Stopping due to background.');
+                stopTimer();
+            }
+        } else if (nextAppState === 'active') {
+            logger.log('[AppState] App coming to foreground. Resuming sensors.');
+            if (!ignoreSensors && !subscriptionRef.current) {
+                _subscribe();
+            }
+        }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+        subscription.remove();
+    };
+  }, [ignoreSensors, stopTimer, logger]);
 
   return {
     status,

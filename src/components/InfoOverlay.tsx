@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform, useWindowDimensions, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform, useWindowDimensions, Linking, Image } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { X, ChevronRight, RefreshCw, FileText, Shield, Scale, Coffee, Github } from 'lucide-react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
@@ -108,6 +108,11 @@ const LicensesContent = () => (
 
 const AboutContent = () => (
     <View className="items-center py-6 mb-4 border-b border-white/5">
+        <Image 
+            source={require('../../assets/icon.png')} 
+            className="w-20 h-20 rounded-2xl mb-4"
+            resizeMode="contain"
+        />
         <Text className="text-white text-xl font-bold mb-2">
             Espresso Shot Timer
         </Text>

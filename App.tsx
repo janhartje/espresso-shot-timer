@@ -20,6 +20,8 @@ import { DebugLogger } from './src/utils/logger';
 import i18n from './src/i18n';
 import { Header } from './src/components/Header';
 import { InfoOverlay } from './src/components/InfoOverlay';
+import { SupportOverlay } from './src/components/SupportOverlay';
+import { initRevenueCat } from './src/utils/revenueCat';
 
 
 export default function App() {
@@ -31,14 +33,19 @@ export default function App() {
   // Onboarding & Info State
   const [showOnboarding, setShowOnboarding] = React.useState(false);
   const [showInfo, setShowInfo] = React.useState(false);
+  const [showSupport, setShowSupport] = React.useState(false);
+  const [isSupporter, setIsSupporter] = React.useState(false);
   const [isOnboardingLoaded, setIsOnboardingLoaded] = React.useState(false);
 
   const checkOnboarding = async () => {
       try {
           const hasSeen = await storage.getHasSeenOnboarding();
+          const supporterStatus = await storage.getIsSupporter();
+          
           if (!hasSeen) {
               setShowOnboarding(true);
           }
+          setIsSupporter(supporterStatus);
       } catch (error) {
           console.error('Failed to check onboarding status:', error);
       } finally {
@@ -48,6 +55,7 @@ export default function App() {
 
   React.useEffect(() => {
     checkOnboarding();
+    initRevenueCat();
   }, []);
 
   const { 
@@ -87,6 +95,18 @@ export default function App() {
       stopTimer();
     }
   }, [isCalibrating, status, stopTimer]);
+
+  // Stop timer when Support overlay opens
+  React.useEffect(() => {
+      if (showSupport && status === 'BREWING') {
+          stopTimer();
+      }
+      
+      // Refresh supporter status when overlay closes (in case purchase happened)
+      if (!showSupport) {
+          storage.getIsSupporter().then(setIsSupporter);
+      }
+  }, [showSupport, status, stopTimer]);
 
   // Debug Banner State
   const [showDebugBanner, setShowDebugBanner] = React.useState(false);
@@ -137,7 +157,11 @@ export default function App() {
             </Svg>
             </View>
             
-            <Header onInfoPress={() => setShowInfo(true)} />
+            <Header 
+                onInfoPress={() => setShowInfo(true)} 
+                onSupportPress={() => setShowSupport(true)}
+                isSupporter={isSupporter}
+            />
 
             <CalibrationOverlay 
             isVisible={isCalibrating} 
@@ -159,6 +183,11 @@ export default function App() {
                     setShowOnboarding(true);
                     setShowInfo(false);
                 }}
+            />
+
+            <SupportOverlay
+                isVisible={showSupport}
+                onClose={() => setShowSupport(false)}
             />
 
             <View className="flex-1 p-3">

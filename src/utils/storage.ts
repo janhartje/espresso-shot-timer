@@ -6,6 +6,7 @@ const KEYS = {
   LAST_SHOT_TIME: 'lastShotTime',
   CALIBRATION_BASELINE: 'calibrationBaseline',
   CALIBRATION_SENSITIVITY: 'calibrationSensitivity',
+  IS_SUPPORTER: 'isSupporter',
 };
 
 export const storage = {
@@ -53,5 +54,14 @@ export const storage = {
   },
   async setCalibrationSensitivity(value: string): Promise<void> {
     await AsyncStorage.setItem(KEYS.CALIBRATION_SENSITIVITY, value);
+  },
+
+  // Supporter Status
+  async getIsSupporter(): Promise<boolean> {
+    const value = await AsyncStorage.getItem(KEYS.IS_SUPPORTER);
+    return value === 'true';
+  },
+  async setIsSupporter(value: boolean): Promise<void> {
+    await AsyncStorage.setItem(KEYS.IS_SUPPORTER, String(value));
   },
 };

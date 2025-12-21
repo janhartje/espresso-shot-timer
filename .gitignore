@@ -31,7 +31,12 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
+
+# credentials (iOS/Android signing)
+credentials.json
+credentials/
 
 # typescript
 *.tsbuildinfo

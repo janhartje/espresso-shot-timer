@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, Dimensions, TextInput } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop, G } from 'react-native-svg';
-import Animated, { useSharedValue, useAnimatedProps, useFrameCallback, runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedProps, useFrameCallback, runOnJS, useAnimatedStyle, withTiming, runOnUI } from 'react-native-reanimated';
 import { ShotStatus } from '../hooks/useShotTimer';
 import { GlassCard } from './GlassCard';
 
@@ -12,9 +12,6 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 const { width } = Dimensions.get('window');
-const RADIUS = 110; 
-const STROKE_WIDTH = 12;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 interface TimerCardProps {
   elapsedTime: number; // For initial/final state
@@ -41,28 +38,25 @@ export const TimerCard: React.FC<TimerCardProps> = ({
 }) => {
   // Initialize with a safe default size to prevent invisibility
   const [dimensions, setDimensions] = React.useState({ width: 300, height: 300 });
-  const [isLayoutReady, setIsLayoutReady] = React.useState(false);
   
-  // Shared values for animation - Initialize from props to avoid flash
-  const initialTotalSeconds = Math.floor(elapsedTime / 1000);
-  const initialMs = Math.floor((elapsedTime % 1000) / 10);
-  
-  const progress = useSharedValue((elapsedTime % 30000) / 30000);
-  const mainText = useSharedValue(initialTotalSeconds.toString().padStart(2, '0'));
-  const msText = useSharedValue(`.${initialMs.toString().padStart(2, '0')}`);
-  const lapIndexSv = useSharedValue(Math.floor(elapsedTime / 30000));
+  // Initialize shared values with 0/empty to avoid reading props during initialization if that was the issue
+  // (though checking props is usually fine, checking .value during render is the big no-no)
+  const progress = useSharedValue(0);
+  const mainText = useSharedValue("00");
+  const msText = useSharedValue(".00");
+  const lapIndexSv = useSharedValue(0);
 
-  // Sync shared values when props change (especially for stop/reset)
+  // Sync shared values in useEffect - this guarantees we are outside the render phase
   useEffect(() => {
-    // If not brewing, we trust the static elapsedTime
+    const totalSeconds = Math.floor(elapsedTime / 1000);
+    const milliseconds = Math.floor((elapsedTime % 1000) / 10);
+    const MAX_TIME = 30000;
+    
+    mainText.value = totalSeconds.toString().padStart(2, '0');
+    msText.value = `.${milliseconds.toString().padStart(2, '0')}`;
+    
+    // If not brewing, set progress based on static time
     if (status !== 'BREWING') {
-        const totalSeconds = Math.floor(elapsedTime / 1000);
-        const milliseconds = Math.floor((elapsedTime % 1000) / 10);
-        
-        mainText.value = totalSeconds.toString().padStart(2, '0');
-        msText.value = `.${milliseconds.toString().padStart(2, '0')}`;
-        
-        const MAX_TIME = 30000;
         progress.value = (elapsedTime % MAX_TIME) / MAX_TIME;
         lapIndexSv.value = Math.floor(elapsedTime / MAX_TIME);
     }
@@ -84,7 +78,10 @@ export const TimerCard: React.FC<TimerCardProps> = ({
         // Update Ring
         const MAX_TIME = 30000;
         progress.value = (currentElapsed % MAX_TIME) / MAX_TIME;
-        lapIndexSv.value = Math.floor(currentElapsed / MAX_TIME);
+        
+        // Update Lap Index (used for color logic if we had safe way to read it)
+        const newLap = Math.floor(currentElapsed / MAX_TIME);
+        lapIndexSv.value = newLap;
     }
   });
 
@@ -100,37 +97,10 @@ export const TimerCard: React.FC<TimerCardProps> = ({
     } as any;
   });
 
-  // Derived state for gradients (this needs to be reactive to re-renders for now, or use logic)
-  // We use a simple JS state for gradient colors that updates occasionally if needed, 
-  // but for 60fps correctness we can just check the lapIndex in JS during render if we want perfect sync,
-  // or accept that color flip might lag one frame. 
-  // Actually, let's just use the shared value to determine styles if we were using Views.
-  // For SVG gradients, we can't easily animate the 'url(#id)' prop from UI thread without a bridge.
-  // So we accept that lap color change (every 30s) happens via React re-render or we assume React updates fast enough.
-  // Given `lapIndexSv` changes on UI thread, we can't observe it easily in JS render without state.
-  // However, the `TimerCard` component will likely NOT re-render during the 30s unless other props change.
-  // To fix this, we can force a re-render every 30s or just let it be. 
-  // Let's use a JS derived value from props for now -> waiting for the user to reach 30s might show old color until some state updates.
-  // Better approach: Pass `startTime` and use `useFrameCallback` to `runOnJS` when lap changes?
-  // For now, let's keep it simple. The ring moves smoothly. The color might stay "Gold" past 30s until something triggers render.
-  // To fix: We can check in useFrameCallback if lap changed and trigger a JS state update.
-  
-  const [currentLapJs, setCurrentLapJs] = React.useState(0);
-  
-  useFrameCallback(() => {
-      if (status === 'BREWING' && startTime) {
-          const now = Date.now();
-          const elapsed = now - startTime;
-          const newLap = Math.floor(elapsed / 30000);
-          if (newLap !== currentLapJs) {
-              runOnJS(setCurrentLapJs)(newLap);
-          }
-      }
-  });
-  
-  // If not brewing, use prop based lap
-  const effectiveLap = status === 'BREWING' ? currentLapJs : Math.floor(elapsedTime / 30000);
-  
+  // Derived state for gradients
+  // Removing the runOnJS listener to prevent re-renders during active timer
+  // This means color flip happens only on explicit re-renders (stop/start/reset)
+  const effectiveLap = Math.floor(elapsedTime / 30000);
   const isEvenLap = effectiveLap % 2 === 0;
   const activeGradient = isEvenLap ? "url(#grad)" : "url(#gradRed)";
   const trackStroke = effectiveLap === 0 ? "rgba(255,255,255,0.05)" : (isEvenLap ? "url(#gradRed)" : "url(#grad)");
@@ -146,7 +116,6 @@ export const TimerCard: React.FC<TimerCardProps> = ({
         const { width, height } = event.nativeEvent.layout;
         if (width > 0 && height > 0) {
             setDimensions({ width, height });
-            setIsLayoutReady(true);
         }
     };
 
@@ -156,11 +125,12 @@ export const TimerCard: React.FC<TimerCardProps> = ({
     const strokeWidth = 12;
     const circumference = 2 * Math.PI * radius;
     
+    // We capture circumference in the closure. 
     const animatedProps = useAnimatedProps(() => {
-    return {
-        strokeDashoffset: circumference * (1 - progress.value),
-    };
-    }, [circumference]); // Re-create when circumference changes
+        return {
+            strokeDashoffset: circumference * (1 - progress.value),
+        };
+    }, [circumference]); 
 
     return (
     <GlassCard 
@@ -188,7 +158,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
                                 <Stop offset="100%" stopColor="#f87171" />
                             </LinearGradient>
                         </Defs>
-                        {/* Track - Represents previous lap or empty state */}
+                        {/* Track */}
                         <Circle
                             cx={radius + strokeWidth}
                             cy={radius + strokeWidth}
@@ -223,12 +193,10 @@ export const TimerCard: React.FC<TimerCardProps> = ({
                                 style={{
                                     fontVariant: ['tabular-nums'],
                                     includeFontPadding: false,
-                                    // Remove text input styles
                                     backgroundColor: 'transparent',
                                     borderWidth: 0,
                                 }}
                                 editable={false}
-                                // Prevent user interaction 
                             />
                              <AnimatedTextInput 
                                 animatedProps={animatedMsTextProps}
@@ -252,7 +220,6 @@ export const TimerCard: React.FC<TimerCardProps> = ({
             onPress={(e) => {
                 // Handle Debug Taps
                 const now = Date.now();
-                // Relaxed timing for easier activation
                 if (now - lastTapRef.current < 800) {
                     tapCountRef.current += 1;
                 } else {
@@ -265,7 +232,6 @@ export const TimerCard: React.FC<TimerCardProps> = ({
                     tapCountRef.current = 0;
                 }
 
-                // Handle Normal Press
                 if (status === 'BREWING') {
                     onStop();
                 } else {
@@ -277,7 +243,6 @@ export const TimerCard: React.FC<TimerCardProps> = ({
             activeOpacity={1}
         />
         
-
     </GlassCard>
   );
 };
