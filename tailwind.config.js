@@ -3,9 +3,12 @@ module.exports = {
   // NOTE: Pre-included NativeWind preset
   presets: [require("nativewind/preset")],
   content: ["./App.{js,jsx,ts,tsx}", "./src/**/*.{js,jsx,ts,tsx}"],
+  darkMode: "media",
   theme: {
     extend: {
       colors: {
+        "brand-light": "#FAFAFA",
+        "brand-dark": "#050505",
         dark: "#050505", // Deep black background
         "card-glass": "rgba(30, 30, 30, 0.4)", // Card background
         "accent-copper": "#C88A53", // Muted copper text

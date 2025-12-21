@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform, ActivityIndicator, Alert, useWindowDimensions, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform, ActivityIndicator, Alert, useWindowDimensions, Image, useColorScheme } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { X, Heart, Coffee, Star, Crown, CheckCircle } from 'lucide-react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
@@ -18,6 +18,8 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
     const insets = useSafeAreaInsets();
     const { width, height } = useWindowDimensions();
     const isLandscape = width > height;
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === 'dark';
 
     const [packages, setPackages] = useState<PurchasesPackage[]>([]);
     const [loading, setLoading] = useState(false);
@@ -83,10 +85,11 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
     if (!isVisible) return null;
 
     const renderPackageIcon = (identifier: string) => {
-        if (identifier.includes('small')) return <Coffee size={24} color="#E6B778" />;
-        if (identifier.includes('medium')) return <Star size={24} color="#E6B778" />;
-        if (identifier.includes('large') || identifier.includes('monthly')) return <Crown size={24} color="#E6B778" />;
-        return <Heart size={24} color="#E6B778" />;
+        const iconColor = isDark ? "#E6B778" : "#8B5A2B";
+        if (identifier.includes('small')) return <Coffee size={24} color={iconColor} />;
+        if (identifier.includes('medium')) return <Star size={24} color={iconColor} />;
+        if (identifier.includes('large') || identifier.includes('monthly')) return <Crown size={24} color={iconColor} />;
+        return <Heart size={24} color={iconColor} />;
     };
 
     const renderMainContent = () => {
@@ -94,8 +97,8 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
             return (
                 <View className="items-center py-8 bg-green-500/10 rounded-2xl border border-green-500/20 mb-6">
                     <CheckCircle size={48} color="#4ADE80" style={{ marginBottom: 16 }} />
-                    <Text className="text-white text-xl font-bold mb-2">{i18n.t('support.thankYou')}</Text>
-                    <Text className="text-white/70 text-center px-4">{successMessage}</Text>
+                    <Text className="text-neutral-900 dark:text-white text-xl font-bold mb-2">{i18n.t('support.thankYou')}</Text>
+                    <Text className="text-neutral-600 dark:text-white/70 text-center px-4">{successMessage}</Text>
                 </View>
             );
         }
@@ -103,7 +106,7 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
         if (loading) {
             return (
                 <View className="py-10">
-                    <ActivityIndicator size="large" color="#E6B778" />
+                    <ActivityIndicator size="large" color={isDark ? "#E6B778" : "#8B5A2B"} />
                 </View>
             );
         }
@@ -126,21 +129,21 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                             key={pack.identifier}
                             onPress={() => handlePurchase(pack)}
                             disabled={purchaseLoading}
-                            className="bg-white/5 border border-white/10 p-4 rounded-2xl flex-row items-center gap-4 active:bg-white/10"
+                            className="bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 p-4 rounded-2xl flex-row items-center gap-4 active:bg-black/10 dark:active:bg-white/10"
                         >
-                            <View className="w-12 h-12 rounded-full bg-white/5 items-center justify-center">
+                            <View className="w-12 h-12 rounded-full bg-black/5 dark:bg-white/5 items-center justify-center">
                                 {renderPackageIcon(pack.product.identifier)}
                             </View>
                             <View className="flex-1">
-                                <Text className="text-white font-bold text-lg">
+                                <Text className="text-neutral-900 dark:text-white font-bold text-lg">
                                     {title}
                                 </Text>
-                                <Text className="text-white/50 text-sm">
+                                <Text className="text-neutral-500 dark:text-white/50 text-sm">
                                     {description}
                                 </Text>
                             </View>
-                            <View className="bg-white/10 px-3 py-1.5 rounded-full">
-                                <Text className="text-[#E6B778] font-bold">
+                            <View className="bg-black/5 dark:bg-white/10 px-3 py-1.5 rounded-full">
+                                <Text className="text-amber-700 dark:text-[#E6B778] font-bold">
                                     {pack.product.priceString}
                                 </Text>
                             </View>
@@ -148,7 +151,7 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                     )})
                 ) : (
                     <View className="py-8 items-center">
-                        <Text className="text-white/50 italic">
+                        <Text className="text-neutral-400 dark:text-white/50 italic">
                             No offerings found. Check configuration.
                         </Text>
                     </View>
@@ -164,9 +167,9 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
             style={[StyleSheet.absoluteFill, { zIndex: 999, justifyContent: 'center', alignItems: 'center' }]}
         >
              {Platform.OS === 'ios' ? (
-                <BlurView intensity={90} tint="dark" style={StyleSheet.absoluteFill} />
+                <BlurView intensity={90} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
             ) : (
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.95)' }]} />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: isDark ? 'rgba(0,0,0,0.95)' : 'rgba(255,255,255,0.95)' }]} />
             )}
 
             <View 
@@ -177,15 +180,15 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                     height: isLandscape ? '80%' : undefined
                 }}
             >
-                <View className={`bg-white/5 border border-white/10 rounded-[32px] overflow-hidden shadow-2xl shadow-black ${isLandscape ? 'flex-1' : ''}`}>
+                <View className={`bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] overflow-hidden shadow-2xl shadow-black ${isLandscape ? 'flex-1' : ''}`}>
                      {/* Header */}
                      <View className="items-center px-6 pt-6 pb-4">
                         {/* Close Button - Top Right */}
                         <TouchableOpacity 
                             onPress={onClose}
-                            className="absolute right-4 top-4 w-10 h-10 items-center justify-center rounded-full bg-white/10 active:bg-white/20 z-10"
+                            className="absolute right-4 top-4 w-10 h-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 active:bg-black/10 dark:active:bg-white/20 z-10"
                         >
-                            <X size={20} color="#FFF" opacity={0.8} />
+                            <X size={20} color={isDark ? "#FFF" : "#000"} opacity={0.8} />
                         </TouchableOpacity>
                         
                         {/* App Icon */}
@@ -196,7 +199,7 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                         />
                         
                         {/* Title */}
-                        <Text className="text-white text-2xl font-bold tracking-tight text-center">
+                        <Text className="text-neutral-900 dark:text-white text-2xl font-bold tracking-tight text-center">
                             {i18n.t('support.title')}
                         </Text>
                     </View>
@@ -206,19 +209,19 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                             {/* Left Column: Description & Restore */}
                             <View className="flex-1 p-6 pt-0 justify-between">
                                 <ScrollView showsVerticalScrollIndicator={false}>
-                                    <Text className="text-white/80 text-base leading-relaxed">
+                                    <Text className="text-neutral-800 dark:text-white/80 text-base leading-relaxed">
                                         {i18n.t('support.description')}
                                     </Text>
                                 </ScrollView>
-                                <View className="pt-4 border-t border-white/5 mt-4">
+                                <View className="pt-4 border-t border-gray-200 dark:border-white/5 mt-4">
                                      {!successMessage && (
                                         <TouchableOpacity 
                                             onPress={handleRestore}
                                             disabled={purchaseLoading}
                                             className="flex-row items-center gap-2 opacity-50 active:opacity-100"
                                         >
-                                            <CheckCircle size={16} color="white" />
-                                            <Text className="text-white text-sm font-medium underline">
+                                            <CheckCircle size={16} color={isDark ? "white" : "black"} />
+                                            <Text className="text-neutral-900 dark:text-white text-sm font-medium underline">
                                                 {i18n.t('support.restore')}
                                             </Text>
                                         </TouchableOpacity>
@@ -227,7 +230,7 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                             </View>
 
                             {/* Right Column: Packages */}
-                            <View className="flex-1 bg-black/20 border-l border-white/5">
+                            <View className="flex-1 bg-gray-50 dark:bg-black/20 border-l border-gray-200 dark:border-white/5">
                                 <ScrollView 
                                     className="flex-1 px-6 py-6"
                                     contentContainerStyle={{ paddingBottom: 24 }}
@@ -245,7 +248,7 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                             showsVerticalScrollIndicator={false}
                         >
                              <View className="mb-6">
-                                <Text className="text-white/80 text-base leading-relaxed text-center">
+                                <Text className="text-neutral-800 dark:text-white/80 text-base leading-relaxed text-center">
                                     {i18n.t('support.description')}
                                 </Text>
                             </View>
@@ -258,7 +261,7 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                                     disabled={purchaseLoading}
                                     className="items-center py-3"
                                 >
-                                    <Text className="text-white/40 text-sm font-medium underline">
+                                    <Text className="text-neutral-400 dark:text-white/40 text-sm font-medium underline">
                                         {i18n.t('support.restore')}
                                     </Text>
                                 </TouchableOpacity>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Platform, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { View, Text, Platform, useWindowDimensions, TouchableOpacity, useColorScheme } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -27,6 +27,8 @@ import { initRevenueCat } from './src/utils/revenueCat';
 export default function App() {
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
 
 
@@ -137,25 +139,31 @@ export default function App() {
       );
   }
 
+
+
+
+
   return (
     <SafeAreaProvider>
-        <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#050505' }}>
-        <SafeAreaView className="flex-1 bg-[#050505]">
-            <StatusBar style="light" />
+        <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaView className="flex-1 bg-brand-light dark:bg-[#050505]">
+            <StatusBar style="auto" />
             
-            {/* Background Gradient - Warm glow behind Timer */}
-            <View className="absolute inset-0">
-            <Svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
-                <Defs>
-                <RadialGradient id="bgGlow" cx="25%" cy="40%" rx="50%" ry="50%">
-                    <Stop offset="0%" stopColor="#C88A53" stopOpacity="0.15" />
-                    <Stop offset="40%" stopColor="#8B5A2B" stopOpacity="0.08" />
-                    <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
-                </RadialGradient>
-                </Defs>
-                <Rect x="0" y="0" width="100%" height="100%" fill="url(#bgGlow)" />
-            </Svg>
-            </View>
+            {/* Background Gradient - Warm glow behind Timer (Dark Mode Only) */}
+            {isDark && (
+                <View className="absolute inset-0">
+                <Svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+                    <Defs>
+                    <RadialGradient id="bgGlow" cx="25%" cy="40%" rx="50%" ry="50%">
+                        <Stop offset="0%" stopColor="#C88A53" stopOpacity="0.15" />
+                        <Stop offset="40%" stopColor="#8B5A2B" stopOpacity="0.08" />
+                        <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
+                    </RadialGradient>
+                    </Defs>
+                    <Rect x="0" y="0" width="100%" height="100%" fill="url(#bgGlow)" />
+                </Svg>
+                </View>
+            )}
             
             <Header 
                 onInfoPress={() => setShowInfo(true)} 

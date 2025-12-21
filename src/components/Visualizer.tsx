@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, useColorScheme } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, withRepeat, withSequence, Easing } from 'react-native-reanimated';
 import { GlassCard } from './GlassCard';
 import i18n from '../i18n';
@@ -12,7 +12,7 @@ interface VisualizerProps {
 
 const BAR_COUNT = 30;
 
-const Bar = ({ index, magnitude, isActive, totalBars }: { index: number; magnitude: number; isActive: boolean; totalBars: number }) => {
+const Bar = ({ index, magnitude, isActive, totalBars, isDark }: { index: number; magnitude: number; isActive: boolean; totalBars: number; isDark: boolean }) => {
     const height = useSharedValue(4); // Default idle height
 
     useEffect(() => {
@@ -53,15 +53,16 @@ const Bar = ({ index, magnitude, isActive, totalBars }: { index: number; magnitu
         // Opacity and slight width variation for "lens" effect
         const pos = Math.abs(index - totalBars / 2) / (totalBars / 2);
         const opacity = 1 - pos * 0.4;
+        const color = isDark ? '#E6B778' : '#8B5A2B';
 
         return {
             height: height.value,
-            backgroundColor: '#E6B778', // Gold
+            backgroundColor: color, // Gold or Dark Coffee
             opacity: opacity,
             borderRadius: 99, // Pill shape
             flex: 1, // Dynamic width
             maxWidth: 16, // Prevent becoming too blocky on huge screens
-            shadowColor: '#E6B778',
+            shadowColor: color,
             shadowOpacity: 0.5,
             shadowRadius: 4,
             elevation: 2
@@ -73,11 +74,13 @@ const Bar = ({ index, magnitude, isActive, totalBars }: { index: number; magnitu
 
 export const Visualizer: React.FC<VisualizerProps> = ({ magnitude, isActive, className }) => {
   const bars = Array.from({ length: BAR_COUNT }, (_, i) => i);
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
     <GlassCard className={`justify-between ${className}`} contentClassName="p-0">
         <View className="absolute top-5 left-5 z-20">
-             <Text className="text-zinc-400 text-lg font-normal tracking-wide opacity-90">{i18n.t('vibration')}</Text>
+             <Text className="text-zinc-500 dark:text-zinc-400 text-lg font-normal tracking-wide opacity-90">{i18n.t('vibration')}</Text>
         </View>
         
         <View className="flex-1 flex-row items-center justify-center h-full w-full pt-10 px-4 gap-[3px]">
@@ -87,7 +90,8 @@ export const Visualizer: React.FC<VisualizerProps> = ({ magnitude, isActive, cla
                     index={i} 
                     magnitude={magnitude} 
                     isActive={isActive} 
-                    totalBars={BAR_COUNT} 
+                    totalBars={BAR_COUNT}
+                    isDark={isDark}
                 />
             ))}
         </View>

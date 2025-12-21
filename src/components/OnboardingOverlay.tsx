@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions, Platform, useColorScheme } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { storage } from '../utils/storage';
 import Animated, { FadeIn, FadeOut, FadeInRight, FadeOutLeft, Layout } from 'react-native-reanimated';
@@ -30,6 +30,8 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ isVisible,
   const [currentStep, setCurrentStep] = useState(0);
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   React.useEffect(() => {
     if (isVisible) {
@@ -69,9 +71,9 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ isVisible,
     >
       {/* Background with Blur */}
       {Platform.OS === 'ios' ? (
-        <BlurView intensity={95} tint="dark" style={StyleSheet.absoluteFill} />
+        <BlurView intensity={95} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
       ) : (
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.96)' }]} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: isDark ? 'rgba(0,0,0,0.96)' : 'rgba(255,255,255,0.96)' }]} />
       )}
 
       {/* Content Container */}
@@ -88,8 +90,8 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ isVisible,
                         exiting={FadeOutLeft.springify().damping(20).mass(0.8)}
                         layout={Layout.springify()}
                     >
-                        <View className="w-40 h-40 rounded-[40px] bg-white/5 border border-white/10 items-center justify-center shadow-2xl shadow-black mb-8">
-                            <IconComponent size={80} color="#E6B778" strokeWidth={1.5} />
+                        <View className="w-40 h-40 rounded-[40px] bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 items-center justify-center shadow-2xl shadow-black mb-8">
+                            <IconComponent size={80} color={isDark ? "#E6B778" : "#8B5A2B"} strokeWidth={1.5} />
                         </View>
                     </Animated.View>
 
@@ -98,7 +100,7 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ isVisible,
                         {STEPS.map((_, index) => (
                             <View 
                                 key={index} 
-                                className={`h-1.5 rounded-full transition-all ${index === currentStep ? 'w-8 bg-accent-copper' : 'w-2 bg-white/20'}`} 
+                                className={`h-1.5 rounded-full transition-all ${index === currentStep ? 'w-8 bg-accent-copper' : 'w-2 bg-black/20 dark:bg-white/20'}`} 
                             />
                         ))}
                     </View>
@@ -113,10 +115,10 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ isVisible,
                         className="gap-4 w-full"
                     >
                         <View className="gap-2">
-                            <Text className="text-white text-4xl font-bold tracking-tight text-left">
+                            <Text className="text-neutral-900 dark:text-white text-4xl font-bold tracking-tight text-left">
                                 {i18n.t(`onboarding.${stepData.key}.title`)}
                             </Text>
-                            <Text className="text-zinc-400 text-lg text-left leading-relaxed">
+                            <Text className="text-neutral-600 dark:text-zinc-400 text-lg text-left leading-relaxed">
                                 {i18n.t(`onboarding.${stepData.key}.description`)}
                             </Text>
                         </View>
@@ -137,7 +139,7 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ isVisible,
                                     onPress={finishOnboarding}
                                     className="h-14 px-4 items-center justify-center"
                                 >
-                                    <Text className="text-white/40 font-medium text-sm">
+                                    <Text className="text-neutral-400 dark:text-white/40 font-medium text-sm">
                                         {i18n.t('onboarding.skip')}
                                     </Text>
                                 </TouchableOpacity>
@@ -154,7 +156,7 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ isVisible,
                     {STEPS.map((_, index) => (
                         <View 
                             key={index} 
-                            className={`h-1 rounded-full transition-all ${index === currentStep ? 'w-8 bg-accent-copper' : 'w-2 bg-white/20'}`} 
+                            className={`h-1 rounded-full transition-all ${index === currentStep ? 'w-8 bg-accent-copper' : 'w-2 bg-black/20 dark:bg-white/20'}`} 
                         />
                     ))}
                 </View>
@@ -167,16 +169,16 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ isVisible,
                     className="items-center gap-6"
                 >
                     {/* Icon Circle */}
-                    <View className="w-32 h-32 rounded-[32px] bg-white/5 border border-white/10 items-center justify-center mb-4 shadow-2xl shadow-black">
-                        <IconComponent size={64} color="#E6B778" strokeWidth={1.5} />
+                    <View className="w-32 h-32 rounded-[32px] bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 items-center justify-center mb-4 shadow-2xl shadow-black">
+                        <IconComponent size={64} color={isDark ? "#E6B778" : "#8B5A2B"} strokeWidth={1.5} />
                     </View>
 
                     {/* Title & Description */}
                     <View className="items-center gap-3">
-                        <Text className="text-white text-3xl font-bold text-center tracking-tight">
+                        <Text className="text-neutral-900 dark:text-white text-3xl font-bold text-center tracking-tight">
                             {i18n.t(`onboarding.${stepData.key}.title`)}
                         </Text>
-                        <Text className="text-zinc-400 text-lg text-center leading-relaxed">
+                        <Text className="text-neutral-600 dark:text-zinc-400 text-lg text-center leading-relaxed">
                             {i18n.t(`onboarding.${stepData.key}.description`)}
                         </Text>
                     </View>
@@ -199,7 +201,7 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ isVisible,
                             onPress={finishOnboarding}
                             className="h-10 items-center justify-center"
                         >
-                            <Text className="text-white/40 font-medium text-sm p-2">
+                            <Text className="text-neutral-400 dark:text-white/40 font-medium text-sm p-2">
                                 {i18n.t('onboarding.skip')}
                             </Text>
                         </TouchableOpacity>

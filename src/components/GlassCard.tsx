@@ -20,7 +20,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({ children, className, inten
     <View 
         className={cn(
             "rounded-[32px] overflow-hidden flex-1 w-full h-full",
-            "bg-[#1A1A1A] border border-white/10",
+            "bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/10",
             className
         )} 
         style={{

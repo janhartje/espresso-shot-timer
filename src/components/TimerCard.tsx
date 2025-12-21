@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, Dimensions, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, TextInput, useColorScheme } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop, G } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedProps, useFrameCallback, runOnJS, useAnimatedStyle, withTiming, runOnUI } from 'react-native-reanimated';
 import { ShotStatus } from '../hooks/useShotTimer';
@@ -97,13 +97,20 @@ export const TimerCard: React.FC<TimerCardProps> = ({
     } as any;
   });
 
+  // Theme
+  const colorScheme = useColorScheme(); // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const isDark = colorScheme === 'dark';
+
   // Derived state for gradients
   // Removing the runOnJS listener to prevent re-renders during active timer
   // This means color flip happens only on explicit re-renders (stop/start/reset)
   const effectiveLap = Math.floor(elapsedTime / 30000);
   const isEvenLap = effectiveLap % 2 === 0;
   const activeGradient = isEvenLap ? "url(#grad)" : "url(#gradRed)";
-  const trackStroke = effectiveLap === 0 ? "rgba(255,255,255,0.05)" : (isEvenLap ? "url(#gradRed)" : "url(#grad)");
+  
+  // Track stroke color needs to adapt to theme
+  const trackStrokeInactive = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+  const trackStroke = effectiveLap === 0 ? trackStrokeInactive : (isEvenLap ? "url(#gradRed)" : "url(#grad)");
   const trackOpacity = 1;
 
 
@@ -139,7 +146,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
     >
         {/* Header - Top Left Absolute */}
         <View className="absolute top-5 left-5 z-20">
-            <Text className="text-zinc-400 text-lg font-normal tracking-wide opacity-90">{i18n.t('timer')}</Text>
+            <Text className="text-zinc-500 dark:text-zinc-400 text-lg font-normal tracking-wide opacity-90">{i18n.t('timer')}</Text>
         </View>
 
         {/* Ring Container - Fills space */}
@@ -166,6 +173,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
                             stroke={trackStroke}
                             strokeOpacity={trackOpacity}
                             strokeWidth={strokeWidth}
+                            fill="none"
                         />
                         {/* Progress Indicator */}
                         <G rotation="-90" origin={`${radius + strokeWidth}, ${radius + strokeWidth}`}>
@@ -178,6 +186,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
                                 strokeLinecap="round"
                                 strokeDasharray={`${circumference} ${circumference}`}
                                 animatedProps={animatedProps}
+                                fill="none"
                             />
                         </G>
                     </Svg>
@@ -189,7 +198,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
                             <AnimatedTextInput 
                                 animatedProps={animatedMainTextProps}
                                 defaultValue={Math.floor(elapsedTime / 1000).toString().padStart(2, '0')}
-                                className="text-white text-[100px] font-bold font-mono tracking-tighter shadow-lg leading-tight text-center p-0 m-0"
+                                className="text-neutral-900 dark:text-white text-[100px] font-bold font-mono tracking-tighter dark:shadow-lg leading-tight text-center p-0 m-0"
                                 style={{
                                     fontVariant: ['tabular-nums'],
                                     includeFontPadding: false,
@@ -201,7 +210,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
                              <AnimatedTextInput 
                                 animatedProps={animatedMsTextProps}
                                 defaultValue={`.${Math.floor((elapsedTime % 1000) / 10).toString().padStart(2, '0')}`}
-                                className="text-accent-copper text-[50px] font-mono font-medium opacity-80 leading-tight p-0 m-0"
+                                className="text-neutral-500 dark:text-accent-copper text-[50px] font-mono font-medium opacity-80 leading-tight p-0 m-0"
                                 style={{
                                     fontVariant: ['tabular-nums'],
                                     includeFontPadding: false,
