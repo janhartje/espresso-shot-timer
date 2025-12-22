@@ -51,6 +51,7 @@ export const useShotTimer = ({
   const [activeVibrationLevel, setActiveVibrationLevel] = useState(0.05); 
   const [sensitivityLevel, setSensitivityLevel] = useState<SensitivityLevel>(10);
   const [hysteresisLevel, setHysteresisLevel] = useState(75);
+  const [preInfusionDelay, setPreInfusionDelay] = useState(0);
   
   // Debug Mode
   const [debugMode, setDebugMode] = useState(false);
@@ -101,6 +102,9 @@ export const useShotTimer = ({
 
               const savedHysteresis = await storage.getHysteresisLevel();
               setHysteresisLevel(savedHysteresis);
+
+              const savedPreInfusion = await storage.getPreInfusionDelay();
+              setPreInfusionDelay(savedPreInfusion);
           } catch (e) {
               console.error('Failed to load persisted state', e);
           } finally {
@@ -201,7 +205,8 @@ export const useShotTimer = ({
         _subscribe();
     }
     return () => _unsubscribe();
-  }, [currentThreshold, isCalibrating, ignoreSensors]); 
+    return () => _unsubscribe();
+  }, [currentThreshold, isCalibrating, ignoreSensors, hysteresisLevel, preInfusionDelay]); 
 
   const _subscribe = () => {
     Accelerometer.setUpdateInterval(20); 
@@ -268,15 +273,17 @@ export const useShotTimer = ({
         }
       } else if (currentStatus === 'BREWING') {
         const timeActive = now - (startTimeRef.current || now);
-        const GRACE_PERIOD = 2500; // 2.5s to ignore lever-pull spikes
+        // Use user-configured preInfusionDelay
+        const gracePeriod = preInfusionDelay; 
 
         // 1. Grace Period: Always keep active
-        if (timeActive < GRACE_PERIOD) {
+        if (timeActive < gracePeriod) {
             lastBelowThresholdTimeRef.current = null;
             return;
         }
 
         // 2. Adaptive Tracking: Track max vibration AFTER grace period
+        // This ensures we only learn the "main phase" vibration
         if (stdDev > brewingMaxStdDevRef.current) {
             brewingMaxStdDevRef.current = stdDev;
         }
@@ -363,6 +370,11 @@ export const useShotTimer = ({
         setHysteresisLevel(val);
         storage.setHysteresisLevel(val);
     },
-    hysteresisLevel
+    hysteresisLevel,
+    setPreInfusionDelay: (val: number) => {
+        setPreInfusionDelay(val);
+        storage.setPreInfusionDelay(val);
+    },
+    preInfusionDelay
   };
 };

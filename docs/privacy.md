@@ -11,14 +11,14 @@ Espresso Shot Timer is a local app. **All data stays on your device.** We respec
 
 ---
 
-## No Data Collection
+## Data Collection
 
-We don't collect any personal data. The app works completely offline and does not require an internet connection for its core functionality.
+We prioritize your privacy. While we do not collect personal data, we collect **anonymized analytics** to improve stability and performance.
 
-- ❌ No personal information collected
-- ❌ No usage analytics
-- ❌ No tracking
-- ❌ No third-party data sharing
+- ❌ No personal information collected (e.g., name, email, location)
+- ✅ Anonymized usage analytics (e.g., app crashes, OS version) via Expo Insights
+- ❌ No tracking for advertising
+- ❌ No third-party data sharing for marketing
 
 ---
 
@@ -53,6 +53,8 @@ If you choose to support the app through in-app purchases, the transaction is pr
 ## Third-Party Services
 
 The app uses **RevenueCat** for managing in-app purchases. RevenueCat may collect anonymous usage data related to purchases. For more information, see [RevenueCat's Privacy Policy](https://www.revenuecat.com/privacy).
+
+The app also uses **Expo (EAS Insights)** to collect anonymous usage and crash data to help us improve the app's stability. For more information, see [Expo's Privacy Policy](https://expo.dev/privacy).
 
 ---
 

@@ -19,7 +19,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.janhartje.espressoshottimer",
-      "versionCode": 5,
+      "versionCode": 6,
       "blockedPermissions": [
         "android.permission.ACTIVITY_RECOGNITION"
       ]
@@ -30,13 +30,14 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.janhartje.espressoshottimer",
-      "buildNumber": "4",
+      "buildNumber": "5",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "plugins": [
       "expo-localization",
+      "expo-insights",
       [
         "expo-splash-screen",
         {

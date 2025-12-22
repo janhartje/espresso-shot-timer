@@ -8,6 +8,7 @@ const KEYS = {
   CALIBRATION_SENSITIVITY: 'calibrationSensitivity',
   IS_SUPPORTER: 'isSupporter',
   HYSTERESIS_LEVEL: 'hysteresisLevel',
+  PRE_INFUSION_DELAY: 'preInfusionDelay',
 };
 
 export const storage = {
@@ -77,5 +78,14 @@ export const storage = {
   },
   async setHysteresisLevel(value: number): Promise<void> {
     await AsyncStorage.setItem(KEYS.HYSTERESIS_LEVEL, String(value));
+  },
+
+  // Pre-Infusion Delay
+  async getPreInfusionDelay(): Promise<number> {
+    const value = await AsyncStorage.getItem(KEYS.PRE_INFUSION_DELAY);
+    return value ? Number(value) : 0; // Default 0s
+  },
+  async setPreInfusionDelay(value: number): Promise<void> {
+    await AsyncStorage.setItem(KEYS.PRE_INFUSION_DELAY, String(value));
   },
 };

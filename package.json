@@ -29,6 +29,7 @@
     "clsx": "^2.1.1",
     "expo": "~54.0.30",
     "expo-blur": "~15.0.8",
+    "expo-insights": "~0.10.8",
     "expo-keep-awake": "~15.0.8",
     "expo-localization": "~17.0.8",
     "expo-sensors": "~15.0.8",

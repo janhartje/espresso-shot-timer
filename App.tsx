@@ -87,7 +87,9 @@ export default function App() {
     toggleDebugMode,
     areSettingsLoaded,
     hysteresisLevel,
-    setHysteresis
+    setHysteresis,
+    preInfusionDelay,
+    setPreInfusionDelay
   } = useShotTimer({ ignoreSensors: showOnboarding });
 
   // Stop timer when Info overlay opens
@@ -215,6 +217,8 @@ export default function App() {
                 onSensitivityChange={setSensitivityLevel}
                 hysteresis={hysteresisLevel}
                 onHysteresisChange={setHysteresis}
+                preInfusionDelay={preInfusionDelay}
+                onPreInfusionDelayChange={setPreInfusionDelay}
                 debugMode={debugMode}
                 onToggleDebug={toggleDebugMode}
             />

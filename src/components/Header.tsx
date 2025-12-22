@@ -14,10 +14,18 @@ export const Header: React.FC<HeaderProps> = ({ onInfoPress, onSupportPress, onS
     const isDark = colorScheme === 'dark';
 
     return (
-        <View className="flex-row items-center justify-between px-5 py-4 bg-transparent z-10 w-full">
+        <View className="flex-row items-center justify-between px-5 py-4 bg-transparent z-10 w-full relative">
+            {/* Absolute Centered Title */}
+            <View className="absolute inset-0 items-center justify-center pointer-events-none z-0">
+                <Text className="text-neutral-900 dark:text-white text-xl font-bold tracking-tight">
+                    Espresso Shot Timer
+                </Text>
+            </View>
+
+            {/* Left Action */}
             <TouchableOpacity 
                 onPress={onSupportPress}
-                className={`w-10 h-10 items-center justify-center rounded-full ${isSupporter ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-black/5 dark:bg-white/5'} active:bg-black/10 dark:active:bg-white/10`}
+                className={`w-10 h-10 items-center justify-center rounded-full ${isSupporter ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-black/5 dark:bg-white/5'} active:bg-black/10 dark:active:bg-white/10 z-10`}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
                 <Heart 
@@ -27,12 +35,9 @@ export const Header: React.FC<HeaderProps> = ({ onInfoPress, onSupportPress, onS
                     opacity={isSupporter ? 1 : 0.8} 
                 />
             </TouchableOpacity>
-
-            <Text className="text-neutral-900 dark:text-white text-xl font-bold tracking-tight">
-                Espresso Shot Timer
-            </Text>
             
-            <View className="flex-row gap-2">
+            {/* Right Actions */}
+            <View className="flex-row gap-2 z-10">
                 <TouchableOpacity 
                     onPress={onSettingsPress}
                     className="w-10 h-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/5 active:bg-black/10 dark:active:bg-white/10"
