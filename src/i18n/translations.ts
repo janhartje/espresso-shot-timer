@@ -45,6 +45,10 @@ export const translations = {
       tip_medium_v2: { title: "Medium Tip", description: "A delicious pastry 🥐" },
       tip_large_v2: { title: "Large Tip", description: "A quick lunch 🥪" },
       reconcuring_tip: { title: "Monthly Support", description: "Join the supporter club! 🌟" },
+      recurring_tip: { title: "Monthly Support", description: "Join the supporter club! 🌟" },
+      monthly_tip: { title: "Monthly Support", description: "Join the supporter club! 🌟" },
+      monthly: { title: "Monthly Support", description: "Join the supporter club! 🌟" },
+      "reconcuring_tip:reconcuringtip": { title: "Monthly Support", description: "Join the supporter club! 🌟" },
     },
     onboarding: {
       step1: {
@@ -128,6 +132,10 @@ export const translations = {
       tip_medium_v2: { title: "Mittleres Trinkgeld", description: "Ein leckeres Teilchen 🥐" },
       tip_large_v2: { title: "Großes Trinkgeld", description: "Ein schnelles Mittagessen 🥪" },
       reconcuring_tip: { title: "Monatliche Unterstützung", description: "Werde Teil des Club! 🌟" },
+      recurring_tip: { title: "Monatliche Unterstützung", description: "Werde Teil des Club! 🌟" },
+      monthly_tip: { title: "Monatliche Unterstützung", description: "Werde Teil des Club! 🌟" },
+      monthly: { title: "Monatliche Unterstützung", description: "Werde Teil des Club! 🌟" },
+      "reconcuring_tip:reconcuringtip": { title: "Monatliche Unterstützung", description: "Werde Teil des Club! 🌟" },
     },
     onboarding: {
       step1: {
@@ -211,6 +219,10 @@ export const translations = {
         tip_medium_v2: { title: "Propina Mediana", description: "Un pastel delicioso 🥐" },
         tip_large_v2: { title: "Propina Grande", description: "Un almuerzo rápido 🥪" },
         reconcuring_tip: { title: "Apoyo Mensual", description: "¡Únete al club! 🌟" },
+      recurring_tip: { title: "Apoyo Mensual", description: "¡Únete al club! 🌟" },
+      monthly_tip: { title: "Apoyo Mensual", description: "¡Únete al club! 🌟" },
+      monthly: { title: "Apoyo Mensual", description: "¡Únete al club! 🌟" },
+      "reconcuring_tip:reconcuringtip": { title: "Apoyo Mensual", description: "¡Únete al club! 🌟" },
     },
     onboarding: {
       step1: {
@@ -294,6 +306,10 @@ export const translations = {
         tip_medium_v2: { title: "Pourboire Moyen", description: "Une délicieuse pâtisserie 🥐" },
         tip_large_v2: { title: "Grand Pourboire", description: "Un déjeuner rapide 🥪" },
         reconcuring_tip: { title: "Soutien Mensuel", description: "Rejoignez le club ! 🌟" },
+      recurring_tip: { title: "Soutien Mensuel", description: "Rejoignez le club ! 🌟" },
+      monthly_tip: { title: "Soutien Mensuel", description: "Rejoignez le club ! 🌟" },
+      monthly: { title: "Soutien Mensuel", description: "Rejoignez le club ! 🌟" },
+      "reconcuring_tip:reconcuringtip": { title: "Soutien Mensuel", description: "Rejoignez le club ! 🌟" },
     },
     onboarding: {
       step1: {
@@ -376,6 +392,10 @@ export const translations = {
         tip_medium_v2: { title: "Gorjeta Média", description: "Um pastel delicioso 🥐" },
         tip_large_v2: { title: "Grande Gorjeta", description: "Um almoço rápido 🥪" },
         reconcuring_tip: { title: "Apoio Mensal", description: "Junte-se ao clube! 🌟" },
+      recurring_tip: { title: "Apoio Mensal", description: "Junte-se ao clube! 🌟" },
+      monthly_tip: { title: "Apoio Mensal", description: "Junte-se ao clube! 🌟" },
+      monthly: { title: "Apoio Mensal", description: "Junte-se ao clube! 🌟" },
+      "reconcuring_tip:reconcuringtip": { title: "Apoio Mensal", description: "Junte-se ao clube! 🌟" },
     },
     onboarding: {
       step1: {
@@ -459,6 +479,10 @@ export const translations = {
         tip_medium_v2: { title: "中费", description: "美味的糕点 🥐" },
         tip_large_v2: { title: "大费", description: "简单的午餐 🥪" },
         reconcuring_tip: { title: "月度支持", description: "加入支持者俱乐部！ 🌟" },
+      recurring_tip: { title: "月度支持", description: "加入支持者俱乐部！ 🌟" },
+      monthly_tip: { title: "月度支持", description: "加入支持者俱乐部！ 🌟" },
+      monthly: { title: "月度支持", description: "加入支持者俱乐部！ 🌟" },
+      "reconcuring_tip:reconcuringtip": { title: "月度支持", description: "加入支持者俱乐部！ 🌟" },
     },
     onboarding: {
       step1: {
@@ -542,6 +566,10 @@ export const translations = {
         tip_medium_v2: { title: "中くらいのチップ", description: "美味しいパン 🥐" },
         tip_large_v2: { title: "大きなチップ", description: "クイックランチ 🥪" },
         reconcuring_tip: { title: "毎月のサポート", description: "サポータークラブに参加！ 🌟" },
+      recurring_tip: { title: "毎月のサポート", description: "サポータークラブに参加！ 🌟" },
+      monthly_tip: { title: "毎月のサポート", description: "サポータークラブに参加！ 🌟" },
+      monthly: { title: "毎月のサポート", description: "サポータークラブに参加！ 🌟" },
+      "reconcuring_tip:reconcuringtip": { title: "毎月のサポート", description: "サポータークラブに参加！ 🌟" },
     },
     onboarding: {
       step1: {
