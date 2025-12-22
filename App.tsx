@@ -21,6 +21,7 @@ import i18n from './src/i18n';
 import { Header } from './src/components/Header';
 import { InfoOverlay } from './src/components/InfoOverlay';
 import { SupportOverlay } from './src/components/SupportOverlay';
+import { SettingsOverlay } from './src/components/SettingsOverlay';
 import { initRevenueCat } from './src/utils/revenueCat';
 
 
@@ -36,6 +37,7 @@ export default function App() {
   const [showOnboarding, setShowOnboarding] = React.useState(false);
   const [showInfo, setShowInfo] = React.useState(false);
   const [showSupport, setShowSupport] = React.useState(false);
+  const [showSettings, setShowSettings] = React.useState(false);
   const [isSupporter, setIsSupporter] = React.useState(false);
   const [isOnboardingLoaded, setIsOnboardingLoaded] = React.useState(false);
 
@@ -47,7 +49,8 @@ export default function App() {
           if (!hasSeen) {
               setShowOnboarding(true);
           }
-          console.log('[App] checkOnboarding - isSupporter:', supporterStatus);
+          const isDebug = await storage.getDebugMode();
+          if (isDebug) console.log('[App] checkOnboarding - isSupporter:', supporterStatus);
           setIsSupporter(supporterStatus);
       } catch (error) {
           console.error('Failed to check onboarding status:', error);
@@ -82,7 +85,9 @@ export default function App() {
     currentDeviation,
     debugMode,
     toggleDebugMode,
-    areSettingsLoaded
+    areSettingsLoaded,
+    hysteresisLevel,
+    setHysteresis
   } = useShotTimer({ ignoreSensors: showOnboarding });
 
   // Stop timer when Info overlay opens
@@ -169,6 +174,7 @@ export default function App() {
             <Header 
                 onInfoPress={() => setShowInfo(true)} 
                 onSupportPress={() => setShowSupport(true)}
+                onSettingsPress={() => setShowSettings(true)}
                 isSupporter={isSupporter}
             />
 
@@ -200,6 +206,17 @@ export default function App() {
                 debugMode={debugMode}
                 onPurchaseComplete={() => setIsSupporter(true)}
                 isSupporter={isSupporter}
+            />
+
+            <SettingsOverlay
+                isVisible={showSettings}
+                onClose={() => setShowSettings(false)}
+                sensitivity={sensitivityLevel}
+                onSensitivityChange={setSensitivityLevel}
+                hysteresis={hysteresisLevel}
+                onHysteresisChange={setHysteresis}
+                debugMode={debugMode}
+                onToggleDebug={toggleDebugMode}
             />
 
             <View className="flex-1 p-3">

@@ -89,7 +89,7 @@ export const useCalibration = ({ logger, onCalibrationComplete, ignoreSensorsRef
 
             const safeActiveLevel = Math.max(0.01, calculatedAvgSD);
             
-            const multiplier = getSensitivityMultiplier('MEDIUM');
+            const multiplier = getSensitivityMultiplier(10);
             const resultingThreshold = safeActiveLevel * multiplier;
             
             logger.log(`[Calibration] Finished. Processed ${buffer.length} samples.`);
@@ -99,7 +99,8 @@ export const useCalibration = ({ logger, onCalibrationComplete, ignoreSensorsRef
             setCalibrationFinished(true);
             
             // Callback to parent to set the actual app state
-            onCalibrationComplete(safeActiveLevel, 'MEDIUM');
+            // Set to Level 12 (approx old Medium/Standard)
+            onCalibrationComplete(safeActiveLevel, 12);
 
             if (uiResetTimeoutRef.current) clearTimeout(uiResetTimeoutRef.current);
             uiResetTimeoutRef.current = setTimeout(() => {

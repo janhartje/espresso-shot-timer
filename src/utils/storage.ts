@@ -7,6 +7,7 @@ const KEYS = {
   CALIBRATION_BASELINE: 'calibrationBaseline',
   CALIBRATION_SENSITIVITY: 'calibrationSensitivity',
   IS_SUPPORTER: 'isSupporter',
+  HYSTERESIS_LEVEL: 'hysteresisLevel',
 };
 
 export const storage = {
@@ -52,18 +53,29 @@ export const storage = {
   async getCalibrationSensitivity(): Promise<string | null> {
     return await AsyncStorage.getItem(KEYS.CALIBRATION_SENSITIVITY);
   },
-  async setCalibrationSensitivity(value: string): Promise<void> {
-    await AsyncStorage.setItem(KEYS.CALIBRATION_SENSITIVITY, value);
+  async setCalibrationSensitivity(value: string | number): Promise<void> {
+    await AsyncStorage.setItem(KEYS.CALIBRATION_SENSITIVITY, String(value));
   },
 
   // Supporter Status
   async getIsSupporter(): Promise<boolean> {
     const value = await AsyncStorage.getItem(KEYS.IS_SUPPORTER);
-    console.log('[Storage] getIsSupporter:', value);
+    const debugMode = await this.getDebugMode();
+    if (debugMode) console.log('[Storage] getIsSupporter:', value);
     return value === 'true';
   },
   async setIsSupporter(value: boolean): Promise<void> {
-    console.log('[Storage] setIsSupporter:', value);
+    const debugMode = await this.getDebugMode();
+    if (debugMode) console.log('[Storage] setIsSupporter:', value);
     await AsyncStorage.setItem(KEYS.IS_SUPPORTER, String(value));
+  },
+
+  // Hysteresis
+  async getHysteresisLevel(): Promise<number> {
+    const value = await AsyncStorage.getItem(KEYS.HYSTERESIS_LEVEL);
+    return value ? Number(value) : 75; // Default 75%
+  },
+  async setHysteresisLevel(value: number): Promise<void> {
+    await AsyncStorage.setItem(KEYS.HYSTERESIS_LEVEL, String(value));
   },
 };

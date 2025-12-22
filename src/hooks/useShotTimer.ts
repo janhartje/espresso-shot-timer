@@ -38,6 +38,7 @@ export const useShotTimer = ({
   const bufferRef = useRef<number[]>([]);
   const lastAboveThresholdTimeRef = useRef<number | null>(null);
   const lastBelowThresholdTimeRef = useRef<number | null>(null);
+  const brewingMaxStdDevRef = useRef<number>(0);
   const startTimeRef = useRef<number | null>(null);
   const subscriptionRef = useRef<any>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | number | null>(null);
@@ -45,9 +46,11 @@ export const useShotTimer = ({
   const lastUiUpdateRef = useRef<number>(0);
   
   // Variance-Based Logic
+  // Variance-Based Logic
   const [currentDeviation, setCurrentDeviation] = useState(0); 
   const [activeVibrationLevel, setActiveVibrationLevel] = useState(0.05); 
-  const [sensitivityLevel, setSensitivityLevel] = useState<SensitivityLevel>('HIGH');
+  const [sensitivityLevel, setSensitivityLevel] = useState<SensitivityLevel>(10);
+  const [hysteresisLevel, setHysteresisLevel] = useState(75);
   
   // Debug Mode
   const [debugMode, setDebugMode] = useState(false);
@@ -73,8 +76,31 @@ export const useShotTimer = ({
 
               const savedSensitivity = await storage.getCalibrationSensitivity();
               if (savedSensitivity !== null) {
-                  setSensitivityLevel(savedSensitivity as SensitivityLevel);
+                  // MIGRATION LOGIC:
+                  // Check if it's a legacy string ('HIGH', 'MEDIUM', 'LOW')
+                  if (savedSensitivity === 'HIGH') {
+                      setSensitivityLevel(17);
+                      storage.setCalibrationSensitivity(17);
+                  } else if (savedSensitivity === 'MEDIUM') {
+                      setSensitivityLevel(10);
+                      storage.setCalibrationSensitivity(10);
+                  } else if (savedSensitivity === 'LOW') {
+                      setSensitivityLevel(4);
+                      storage.setCalibrationSensitivity(4);
+                  } else {
+                      // It should be a number (stringified)
+                      const numericSensitivity = Number(savedSensitivity);
+                      if (!isNaN(numericSensitivity)) {
+                          setSensitivityLevel(numericSensitivity);
+                      } else {
+                          // Fallback
+                          setSensitivityLevel(10);
+                      }
+                  }
               }
+
+              const savedHysteresis = await storage.getHysteresisLevel();
+              setHysteresisLevel(savedHysteresis);
           } catch (e) {
               console.error('Failed to load persisted state', e);
           } finally {
@@ -230,6 +256,10 @@ export const useShotTimer = ({
             } else if (now - lastAboveThresholdTimeRef.current > startDelay) {
                 logger.log(`[Action] STARTING TIMER`); 
                 if (currentStatus === 'FINISHED') resetTimer();
+                
+                // Reset adaptive tracking on start
+                brewingMaxStdDevRef.current = thresholdRef.current;
+                
                 startTimer();
                 lastAboveThresholdTimeRef.current = null; 
             }
@@ -237,15 +267,30 @@ export const useShotTimer = ({
             lastAboveThresholdTimeRef.current = null;
         }
       } else if (currentStatus === 'BREWING') {
-        // Hysteresis: Keep active > 60% of trigger
-        const isStillActive = stdDev > (thresholdRef.current * 0.6);
+        const timeActive = now - (startTimeRef.current || now);
+        const GRACE_PERIOD = 2500; // 2.5s to ignore lever-pull spikes
+
+        // 1. Grace Period: Always keep active
+        if (timeActive < GRACE_PERIOD) {
+            lastBelowThresholdTimeRef.current = null;
+            return;
+        }
+
+        // 2. Adaptive Tracking: Track max vibration AFTER grace period
+        if (stdDev > brewingMaxStdDevRef.current) {
+            brewingMaxStdDevRef.current = stdDev;
+        }
+
+        // 3. Stop Condition: Use dynamic max as reference
+        // Hysteresis: Keep active > hysteresis% of dynamic max (or at least original threshold)
+        const referenceLevel = Math.max(thresholdRef.current, brewingMaxStdDevRef.current);
+        const isStillActive = stdDev > (referenceLevel * (hysteresisLevel / 100));
 
         if (!isStillActive) {
             if (!lastBelowThresholdTimeRef.current) {
                 lastBelowThresholdTimeRef.current = now;
             } else if (now - lastBelowThresholdTimeRef.current > stopDelay) {
-                logger.log(`[Action] STOPPING TIMER`); 
-                // Pass the time when vibration ACTUALLY started dropping below threshold
+                logger.log(`[Action] STOPPING TIMER (Adaptive)`); 
                 stopTimer(lastBelowThresholdTimeRef.current);
                 lastBelowThresholdTimeRef.current = null; 
             }
@@ -287,6 +332,11 @@ export const useShotTimer = ({
     };
   }, [ignoreSensors, stopTimer, logger]);
 
+  const setSensitivity = useCallback((level: SensitivityLevel) => {
+      setSensitivityLevel(level);
+      storage.setCalibrationSensitivity(level).catch(e => console.error('Failed to save sensitivity', e));
+  }, []);
+
   return {
     status,
     elapsedTime,
@@ -305,9 +355,14 @@ export const useShotTimer = ({
     baseline: activeVibrationLevel, 
     threshold: currentThreshold,
     sensitivityLevel,
-    setSensitivityLevel,
+    setSensitivityLevel: setSensitivity,
     debugMode,
     toggleDebugMode,
-    areSettingsLoaded
+    areSettingsLoaded,
+    setHysteresis: (val: number) => {
+        setHysteresisLevel(val);
+        storage.setHysteresisLevel(val);
+    },
+    hysteresisLevel
   };
 };

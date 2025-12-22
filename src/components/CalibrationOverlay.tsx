@@ -47,8 +47,11 @@ export const CalibrationOverlay: React.FC<CalibrationOverlayProps> = ({
                      <CheckCircle size={100} color="#4ade80" />
                      <View className="gap-2">
                         <Text className="text-neutral-900 dark:text-white text-4xl font-bold">{i18n.t('calibrated')}</Text>
-                        <Text className="text-neutral-600 dark:text-white/60 text-lg mb-8">
+                        <Text className="text-neutral-600 dark:text-white/60 text-lg mb-2">
                             {i18n.t('calibrationSaved')}
+                        </Text>
+                        <Text className="text-neutral-500 dark:text-white/50 text-sm mb-8 italic">
+                            {i18n.t('calibrationHint')}
                         </Text>
                          <TouchableOpacity 
                             onPress={onCancel}
@@ -62,8 +65,11 @@ export const CalibrationOverlay: React.FC<CalibrationOverlayProps> = ({
                 <View className="items-center gap-4">
                     <CheckCircle size={80} color="#4ade80" />
                     <Text className="text-neutral-900 dark:text-white text-3xl font-bold">{i18n.t('calibrated')}</Text>
-                    <Text className="text-neutral-600 dark:text-white/60 text-center mb-8">
+                    <Text className="text-neutral-600 dark:text-white/60 text-center mb-2">
                         {i18n.t('calibrationSaved')}
+                    </Text>
+                    <Text className="text-neutral-500 dark:text-white/50 text-xs text-center mb-8 italic px-4">
+                        {i18n.t('calibrationHint')}
                     </Text>
                      <TouchableOpacity 
                         onPress={onCancel}

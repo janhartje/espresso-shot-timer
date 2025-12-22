@@ -1,11 +1,21 @@
-export type SensitivityLevel = 'LOW' | 'MEDIUM' | 'HIGH';
+export type SensitivityLevel = number;
 
 export const getSensitivityMultiplier = (level: SensitivityLevel) => {
-    switch(level) {
-        case 'HIGH': return 0.2; 
-        case 'MEDIUM': return 0.5; 
-        case 'LOW': return 0.8; 
-    }
+    // Map 1-20 to a reasonable multiplier range
+    // Level 1 = Low Sensitivity (Multiplier 1.5)
+    // Level 10 = Standard (Multiplier 0.5)
+    // Level 20 = High Sensitivity (Multiplier 0.05)
+    
+    // Linear mapping or exponential?
+    // Let's try mapping: 1 -> 1.5, 20 -> 0.05
+    const minMult = 0.05;
+    const maxMult = 1.5;
+    const minLevel = 1;
+    const maxLevel = 20;
+
+    // Inverse relationship: High level = Low Multiplier
+    const ratio = (level - minLevel) / (maxLevel - minLevel);
+    return maxMult - (ratio * (maxMult - minMult));
 };
 
 export const calculateSD = (arr: number[]) => {
