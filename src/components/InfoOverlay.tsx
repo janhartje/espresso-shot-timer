@@ -81,7 +81,7 @@ const ImprintContent = ({ isDark }: { isDark: boolean }) => (
             Jan Hartje
         </Text>
         <Text className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed mb-4">
-            E-Mail: jan@hartje.de
+            E-Mail: support@janhartje.com
         </Text>
         <Text className="text-neutral-800 dark:text-white/90 text-base leading-relaxed mb-4 mt-6">
             {i18n.t('imprintContent.disclaimer')}
@@ -133,7 +133,7 @@ const AboutContent = ({ isDark }: { isDark: boolean }) => (
         <View className="flex-row items-center gap-1">
             <Text className="text-zinc-500 dark:text-zinc-400 text-xs">Made with</Text>
             <Coffee size={12} color={isDark ? "#C88A53" : "#8B5A2B"} />
-            <Text className="text-zinc-500 dark:text-zinc-400 text-xs">by Jan Hartje</Text>
+            <Text className="text-zinc-500 dark:text-zinc-400 text-xs">in Hannover</Text>
         </View>
     </View>
 );
