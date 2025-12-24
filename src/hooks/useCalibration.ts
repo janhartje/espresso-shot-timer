@@ -110,7 +110,7 @@ export const useCalibration = ({ logger, onCalibrationComplete, ignoreSensorsRef
             }, 3000);
 
         } catch (e) {
-            console.error("[Calibration] Error in finishCalibration:", e);
+            logger.error("[Calibration] Error in finishCalibration:", e);
             stopCalibration();
         } finally {
             ignoreSensorsRef.current = Date.now() + 2000;

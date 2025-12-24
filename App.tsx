@@ -16,14 +16,14 @@ import { GlassCard } from './src/components/GlassCard';
 import { CalibrationCard } from './src/components/CalibrationCard';
 import { OnboardingOverlay } from './src/components/OnboardingOverlay';
 import { storage } from './src/utils/storage';
-import { DebugLogger } from './src/utils/logger';
 import i18n from './src/i18n';
 import { Header } from './src/components/Header';
 import { InfoOverlay } from './src/components/InfoOverlay';
 import { SupportOverlay } from './src/components/SupportOverlay';
 import { SettingsOverlay } from './src/components/SettingsOverlay';
-import { initRevenueCat } from './src/utils/revenueCat';
+import { initRevenueCat, setRevenueCatLogger } from './src/utils/revenueCat';
 
+import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 
 export default function App() {
   const { width, height } = useWindowDimensions();
@@ -41,7 +41,7 @@ export default function App() {
   const [isSupporter, setIsSupporter] = React.useState(false);
   const [isOnboardingLoaded, setIsOnboardingLoaded] = React.useState(false);
 
-  const checkOnboarding = async () => {
+  const checkOnboarding = async (logInstance?: any) => {
       try {
           const hasSeen = await storage.getHasSeenOnboarding();
           const supporterStatus = await storage.getIsSupporter();
@@ -50,19 +50,16 @@ export default function App() {
               setShowOnboarding(true);
           }
           const isDebug = await storage.getDebugMode();
-          if (isDebug) console.log('[App] checkOnboarding - isSupporter:', supporterStatus);
+          if (isDebug && logInstance) logInstance.log('[App] checkOnboarding - isSupporter:', supporterStatus);
           setIsSupporter(supporterStatus);
       } catch (error) {
-          console.error('Failed to check onboarding status:', error);
+          if (logInstance) logInstance.log('[App] Failed to check onboarding status:', error);
       } finally {
           setIsOnboardingLoaded(true);
       }
   };
 
-  React.useEffect(() => {
-    checkOnboarding();
-    initRevenueCat();
-  }, []);
+
 
   const { 
     status, 
@@ -89,8 +86,32 @@ export default function App() {
     hysteresisLevel,
     setHysteresis,
     preInfusionDelay,
-    setPreInfusionDelay
+    setPreInfusionDelay,
+    logger
   } = useShotTimer({ ignoreSensors: showOnboarding });
+
+  React.useEffect(() => {
+    checkOnboarding(logger);
+    
+    (async () => {
+        logger.log('[App] Tracking permission flow start');
+        setRevenueCatLogger(logger);
+        
+        try {
+          const { status } = await requestTrackingPermissionsAsync();
+          if (status === 'granted') {
+            logger.log('[App] Tracking permission granted');
+          } else {
+            logger.log('[App] Tracking permission denied or restricted:', status);
+          }
+        } catch (e) {
+          logger.log('[App] Error requesting tracking permission:', e);
+        } finally {
+          // Initialize RevenueCat regardless of permission status
+          initRevenueCat();
+        }
+    })();
+  }, []);
 
   // Stop timer when Info overlay opens
   React.useEffect(() => {
@@ -122,11 +143,7 @@ export default function App() {
   const [showDebugBanner, setShowDebugBanner] = React.useState(false);
   const [debugBannerMessage, setDebugBannerMessage] = React.useState("");
 
-  // Debug Logger
-  const debugModeRef = React.useRef(debugMode);
-  React.useEffect(() => { debugModeRef.current = debugMode; }, [debugMode]);
-  const loggerRef = React.useRef(new DebugLogger(debugModeRef));
-  const logger = loggerRef.current;
+
 
 
   // Helper for Last Shot format

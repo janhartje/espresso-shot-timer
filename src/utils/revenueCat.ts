@@ -1,6 +1,27 @@
 import Purchases, { PurchasesPackage, PurchasesOffering } from 'react-native-purchases';
 import { Platform } from 'react-native';
 
+interface Logger {
+    log: (message: string, ...args: any[]) => void;
+}
+
+let logger: Logger | null = null;
+
+export const setRevenueCatLogger = (l: Logger) => {
+    logger = l;
+};
+
+const log = (message: string, ...args: any[]) => {
+    if (logger) {
+        logger.log(`[RevenueCat] ${message}`, ...args);
+    } else {
+        // Fallback or silence? Keeping silence or conditional log might be safer to respect DebugMode.
+        // Assuming if no logger is set, we might be in early init or debug mode is off.
+        // However, for critical setup errors, maybe we still want console?
+        // Let's stick to only using the logger if provided, to respect the "checking" requirement.
+    }
+};
+
 // API Keys from environment variables (set in .env or EAS Secrets)
 const API_KEYS = {
   ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || '',
@@ -11,7 +32,7 @@ let isConfigured = false;
 
 export const initRevenueCat = async () => {
   if (!API_KEYS.ios && !API_KEYS.android) {
-    console.log('RevenueCat: No API keys configured. Set EXPO_PUBLIC_REVENUECAT_IOS_KEY and/or EXPO_PUBLIC_REVENUECAT_ANDROID_KEY.');
+    log('No API keys configured. Set EXPO_PUBLIC_REVENUECAT_IOS_KEY and/or EXPO_PUBLIC_REVENUECAT_ANDROID_KEY.');
     return;
   }
 
@@ -23,7 +44,7 @@ export const initRevenueCat = async () => {
     }
     isConfigured = true;
   } catch (e) {
-      console.log('RevenueCat: Failed to configure', e);
+      log('Failed to configure', e);
   }
 };
 
@@ -37,7 +58,7 @@ export const getOfferings = async (): Promise<PurchasesOffering | null> => {
     }
   } catch (e: any) {
     if (!e.message.includes('There is no singleton instance')) {
-        console.log('Error fetching offerings:', e);
+        log('Error fetching offerings:', e);
     }
   }
   return null;
@@ -51,7 +72,7 @@ export const purchasePackage = async (pack: PurchasesPackage) => {
     return customerInfo;
   } catch (e: any) {
     if (!e.userCancelled) {
-      console.log('Error purchasing package:', e);
+      log('Error purchasing package:', e);
       throw e;
     }
   }
@@ -59,7 +80,7 @@ export const purchasePackage = async (pack: PurchasesPackage) => {
 
 export const restorePurchases = async () => {
     if (!isConfigured) {
-        console.log('RevenueCat: Not configured, cannot restore purchases.');
+        log('Not configured, cannot restore purchases.');
         return null;
     }
 
@@ -67,7 +88,7 @@ export const restorePurchases = async () => {
         const customerInfo = await Purchases.restorePurchases();
         return customerInfo;
     } catch (e) {
-        console.log('Error restoring purchases:', e);
+        log('Error restoring purchases:', e);
         throw e;
     }
 }

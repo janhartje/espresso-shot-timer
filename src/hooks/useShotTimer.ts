@@ -106,7 +106,7 @@ export const useShotTimer = ({
               const savedPreInfusion = await storage.getPreInfusionDelay();
               setPreInfusionDelay(savedPreInfusion);
           } catch (e) {
-              console.error('Failed to load persisted state', e);
+              logger.error('[Timer] Failed to load persisted state', e);
           } finally {
               setAreSettingsLoaded(true);
           }
@@ -121,7 +121,7 @@ export const useShotTimer = ({
   const toggleDebugMode = useCallback(async () => {
       setDebugMode(prev => {
           const newState = !prev;
-          storage.setDebugMode(newState).catch(e => console.error(e));
+          storage.setDebugMode(newState).catch(e => logger.error('[Timer] Failed to save debug mode', e));
           return newState;
       });
   }, []);
@@ -148,8 +148,8 @@ export const useShotTimer = ({
       onCalibrationComplete: (newLevel, newSensitivity) => {
           setActiveVibrationLevel(newLevel);
           setSensitivityLevel(newSensitivity);
-          storage.setCalibrationBaseline(newLevel).catch(e => console.error(e));
-          storage.setCalibrationSensitivity(newSensitivity).catch(e => console.error(e));
+          storage.setCalibrationBaseline(newLevel).catch(e => logger.error('[Timer] Failed to save calibration baseline', e));
+          storage.setCalibrationSensitivity(newSensitivity).catch(e => logger.error('[Timer] Failed to save calibration sensitivty', e));
       }
   });
 
@@ -181,7 +181,7 @@ export const useShotTimer = ({
       
       setElapsedTime(finalTime);
       setLastShotTime(finalTime);
-      storage.setLastShotTime(finalTime).catch(e => console.error('Failed to save last shot', e));
+      storage.setLastShotTime(finalTime).catch(e => logger.error('[Timer] Failed to save last shot', e));
     }
   }, []);
 
@@ -247,7 +247,7 @@ export const useShotTimer = ({
 
       if (debugModeRef.current) {
         if (Math.random() < 0.05) {
-            console.log(`[Sensor] Mag: ${magnitude.toFixed(3)} | Dev: ${stdDev.toFixed(3)} | Thresh: ${thresholdRef.current.toFixed(3)} | State: ${currentStatus}`);
+            logger.log(`[Sensor] Mag: ${magnitude.toFixed(3)} | Dev: ${stdDev.toFixed(3)} | Thresh: ${thresholdRef.current.toFixed(3)} | State: ${currentStatus}`);
         }
       }
 
@@ -341,7 +341,7 @@ export const useShotTimer = ({
 
   const setSensitivity = useCallback((level: SensitivityLevel) => {
       setSensitivityLevel(level);
-      storage.setCalibrationSensitivity(level).catch(e => console.error('Failed to save sensitivity', e));
+      storage.setCalibrationSensitivity(level).catch(e => logger.error('[Timer] Failed to save sensitivity', e));
   }, []);
 
   return {
@@ -375,6 +375,7 @@ export const useShotTimer = ({
         setPreInfusionDelay(val);
         storage.setPreInfusionDelay(val);
     },
-    preInfusionDelay
+    preInfusionDelay,
+    logger
   };
 };
