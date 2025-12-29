@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Platform, useWindowDimensions, TouchableOpacity, useColorScheme } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -90,14 +90,26 @@ export default function App() {
     logger
   } = useShotTimer({ ignoreSensors: showOnboarding });
 
-  React.useEffect(() => {
+  // Move isAppReady definition up so it can be used in effects
+  const isAppReady = isOnboardingLoaded && areSettingsLoaded;
+
+  // Initialize Onboarding Check
+  useEffect(() => {
     checkOnboarding(logger);
-    
+  }, []);
+
+  // Handle Tracking Permissions when App is Ready
+  useEffect(() => {
+    if (!isAppReady) return;
+
     (async () => {
         logger.log('[App] Tracking permission flow start');
         setRevenueCatLogger(logger);
         
         try {
+          // Add a small delay to ensure UI is fully mounted and transition is complete
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
           const { status } = await requestTrackingPermissionsAsync();
           if (status === 'granted') {
             logger.log('[App] Tracking permission granted');
@@ -111,7 +123,7 @@ export default function App() {
           initRevenueCat();
         }
     })();
-  }, []);
+  }, [isAppReady]);
 
   // Stop timer when Info overlay opens
   React.useEffect(() => {
@@ -143,6 +155,14 @@ export default function App() {
   const [showDebugBanner, setShowDebugBanner] = React.useState(false);
   const [debugBannerMessage, setDebugBannerMessage] = React.useState("");
 
+  if (!isAppReady) {
+      return (
+          <View className="flex-1 bg-[#050505] items-center justify-center">
+              <StatusBar style="light" />
+          </View>
+      );
+  }
+
 
 
 
@@ -153,16 +173,7 @@ export default function App() {
     return `${totalSeconds}.${milliseconds}s`;
   };
 
-  const isAppReady = isOnboardingLoaded && areSettingsLoaded;
 
-  if (!isAppReady) {
-      return (
-          <View className="flex-1 bg-[#050505] items-center justify-center">
-              <StatusBar style="light" />
-              {/* Optional: Add a logo or spinner here */}
-          </View>
-      );
-  }
 
 
 
