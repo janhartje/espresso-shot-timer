@@ -13,7 +13,7 @@ interface InfoOverlayProps {
     onResetOnboarding: () => void;
 }
 
-type LegalScreen = 'menu' | 'privacy' | 'imprint' | 'licenses';
+type LegalScreen = 'menu' | 'imprint' | 'licenses';
 
 const LegalContentScreen = ({ 
     title, 
@@ -52,25 +52,7 @@ const LegalContentScreen = ({
     </>
 );
 
-const PrivacyContent = ({ isDark }: { isDark: boolean }) => (
-    <View>
-        <Text className="text-neutral-800 dark:text-white/90 text-base leading-relaxed mb-4">
-            {i18n.t('privacyContent.intro')}
-        </Text>
-        <Text className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed mb-4">
-            <Text className="font-bold text-neutral-900 dark:text-white/80">{i18n.t('privacyContent.noDataCollection')}</Text>
-            {i18n.t('privacyContent.noDataCollectionDesc')}
-        </Text>
-        <Text className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed mb-4">
-            <Text className="font-bold text-neutral-900 dark:text-white/80">{i18n.t('privacyContent.sensorData')}</Text>
-            {i18n.t('privacyContent.sensorDataDesc')}
-        </Text>
-        <Text className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed mb-4">
-            <Text className="font-bold text-neutral-900 dark:text-white/80">{i18n.t('privacyContent.localStorage')}</Text>
-            {i18n.t('privacyContent.localStorageDesc')}
-        </Text>
-    </View>
-);
+
 
 const ImprintContent = ({ isDark }: { isDark: boolean }) => (
     <View>
@@ -186,8 +168,13 @@ const MenuLinks = ({
             <MenuRow 
                 icon={Shield} 
                 label={i18n.t('privacyPolicy')} 
-                onPress={() => onNavigate('privacy')} 
-                isActive={currentScreen === 'privacy'}
+                onPress={() => Linking.openURL('https://janhartje.github.io/espresso-shot-timer/privacy')} 
+                isDark={isDark}
+            />
+            <MenuRow 
+                icon={Scale} 
+                label={i18n.t('terms')} 
+                onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')} 
                 isDark={isDark}
             />
             <MenuRow 
@@ -198,7 +185,7 @@ const MenuLinks = ({
                 isDark={isDark}
             />
             <MenuRow 
-                icon={Scale} 
+                icon={Github} 
                 label={i18n.t('openSource')} 
                 onPress={() => onNavigate('licenses')} 
                 isActive={currentScreen === 'licenses'}
@@ -239,8 +226,6 @@ export const InfoOverlay: React.FC<InfoOverlayProps> = ({ isVisible, onClose, on
     // Content renderer based on current screen
     const renderContent = () => {
         switch (currentScreen) {
-            case 'privacy':
-                return <LegalContentScreen title={i18n.t('privacyPolicy')} onBack={() => setCurrentScreen('menu')} isLandscape={isLandscape} isDark={isDark}><PrivacyContent isDark={isDark} /></LegalContentScreen>;
             case 'imprint':
                 return <LegalContentScreen title={i18n.t('imprint')} onBack={() => setCurrentScreen('menu')} isLandscape={isLandscape} isDark={isDark}><ImprintContent isDark={isDark} /></LegalContentScreen>;
             case 'licenses':

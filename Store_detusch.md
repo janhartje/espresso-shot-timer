@@ -62,3 +62,4 @@ Perfekt für Home-Baristas und Kaffeeliebhaber, die ihren Workflow optimieren un
 ## URLs
 - **Support URL:** `https://github.com/janhartje/espresso-shot-timer/issues`
 - **Privacy Policy URL:** `https://janhartje.github.io/espresso-shot-timer/privacy`
+- **Nutzungsbedingungen (EULA):** `https://www.apple.com/legal/internet-services/itunes/dev/stdeula/` (Apple Standard EULA)

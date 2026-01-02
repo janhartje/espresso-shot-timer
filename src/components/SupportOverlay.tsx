@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform, ActivityIndicator, Alert, useWindowDimensions, Image, useColorScheme } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform, ActivityIndicator, Alert, useWindowDimensions, Image, useColorScheme, Linking } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { X, Heart, Coffee, Star, Crown, CheckCircle } from 'lucide-react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
@@ -252,16 +252,38 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                                 </ScrollView>
                                 <View className="pt-4 border-t border-gray-200 dark:border-white/5 mt-4">
                                      {!successMessage && (
-                                        <TouchableOpacity 
-                                            onPress={handleRestore}
-                                            disabled={purchaseLoading}
-                                            className="flex-row items-center gap-2 opacity-50 active:opacity-100"
-                                        >
-                                            <CheckCircle size={16} color={isDark ? "white" : "black"} />
-                                            <Text className="text-neutral-900 dark:text-white text-sm font-medium underline">
-                                                {i18n.t('support.restore')}
-                                            </Text>
-                                        </TouchableOpacity>
+                                        <View>
+                                            <TouchableOpacity 
+                                                onPress={handleRestore}
+                                                disabled={purchaseLoading}
+                                                className="flex-row items-center gap-2 opacity-50 active:opacity-100 mb-4"
+                                            >
+                                                <CheckCircle size={16} color={isDark ? "white" : "black"} />
+                                                <Text className="text-neutral-900 dark:text-white text-sm font-medium underline">
+                                                    {i18n.t('support.restore')}
+                                                </Text>
+                                            </TouchableOpacity>
+
+                                            <View className="flex-row gap-4 flex-wrap">
+                                                <TouchableOpacity 
+                                                    onPress={() => Linking.openURL('https://janhartje.github.io/espresso-shot-timer/privacy')}
+                                                    className="active:opacity-50 py-2"
+                                                >
+                                                    <Text className="text-neutral-900 dark:text-white text-sm font-medium underline">
+                                                        {i18n.t('privacyPolicy')}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                                
+                                                <TouchableOpacity 
+                                                    onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}
+                                                    className="active:opacity-50 py-2"
+                                                >
+                                                    <Text className="text-neutral-900 dark:text-white text-sm font-medium underline">
+                                                        {i18n.t('terms')}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
                                      )}
                                 </View>
                             </View>
@@ -293,15 +315,37 @@ export const SupportOverlay: React.FC<SupportOverlayProps> = ({ isVisible, onClo
                             {renderMainContent()}
 
                             {!successMessage && (
-                                <TouchableOpacity 
-                                    onPress={handleRestore}
-                                    disabled={purchaseLoading}
-                                    className="items-center py-3"
-                                >
-                                    <Text className="text-neutral-400 dark:text-white/40 text-sm font-medium underline">
-                                        {i18n.t('support.restore')}
-                                    </Text>
-                                </TouchableOpacity>
+                                <View className="items-center">
+                                    <TouchableOpacity 
+                                        onPress={handleRestore}
+                                        disabled={purchaseLoading}
+                                        className="py-3"
+                                    >
+                                        <Text className="text-neutral-400 dark:text-white/40 text-sm font-medium underline">
+                                            {i18n.t('support.restore')}
+                                        </Text>
+                                    </TouchableOpacity>
+
+                                    <View className="flex-row gap-6 mt-4">
+                                        <TouchableOpacity 
+                                            onPress={() => Linking.openURL('https://janhartje.github.io/espresso-shot-timer/privacy')}
+                                            className="active:opacity-50 py-2"
+                                        >
+                                            <Text className="text-neutral-600 dark:text-white/70 text-sm font-medium underline">
+                                                {i18n.t('privacyPolicy')}
+                                            </Text>
+                                        </TouchableOpacity>
+                                        
+                                        <TouchableOpacity 
+                                            onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}
+                                            className="active:opacity-50 py-2"
+                                        >
+                                            <Text className="text-neutral-600 dark:text-white/70 text-sm font-medium underline">
+                                                {i18n.t('terms')}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
                             )}
                         </ScrollView>
                     )}

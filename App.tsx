@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, Platform, useWindowDimensions, TouchableOpacity, useColorScheme } from 'react-native';
+import { View, Text, Platform, useWindowDimensions, TouchableOpacity, useColorScheme, AppState } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -102,13 +102,29 @@ export default function App() {
   useEffect(() => {
     if (!isAppReady) return;
 
-    (async () => {
+    let timeoutId: NodeJS.Timeout;
+
+    const requestTracking = async () => {
         logger.log('[App] Tracking permission flow start');
         setRevenueCatLogger(logger);
         
         try {
-          // Add a small delay to ensure UI is fully mounted and transition is complete
-          await new Promise(resolve => setTimeout(resolve, 500));
+          // Wait for app to be active to ensure prompt can be shown
+          // This fixes issues where prompt doesn't appear on startup
+          if (AppState.currentState !== 'active') {
+             logger.log('[App] Waiting for app to be active for ATT prompt...');
+             await new Promise<void>(resolve => {
+                 const subscription = AppState.addEventListener('change', (nextAppState) => {
+                     if (nextAppState === 'active') {
+                         subscription.remove();
+                         resolve();
+                     }
+                 });
+             });
+          }
+
+          // specific delay for older iOS versions or slow startups
+          await new Promise(resolve => setTimeout(resolve, 1000));
           
           const { status } = await requestTrackingPermissionsAsync();
           if (status === 'granted') {
@@ -122,7 +138,13 @@ export default function App() {
           // Initialize RevenueCat regardless of permission status
           initRevenueCat();
         }
-    })();
+    };
+
+    requestTracking();
+
+    return () => {
+        if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [isAppReady]);
 
   // Stop timer when Info overlay opens
