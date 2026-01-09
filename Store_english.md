@@ -63,3 +63,9 @@ Perfect for home baristas and coffee lovers who want to optimize their workflow 
 - **Support URL:** `https://github.com/janhartje/espresso-shot-timer/issues`
 - **Privacy Policy URL:** `https://janhartje.github.io/espresso-shot-timer/privacy`
 - **Terms of Use (EULA):** `https://www.apple.com/legal/internet-services/itunes/dev/stdeula/` (Apple Standard EULA)
+
+---
+
+## What's New (Version 1.0.1)
+- Fix: The "Calibrated!" overlay now closes reliably.
+- Minor optimizations.
