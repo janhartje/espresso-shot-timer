@@ -1,6 +1,6 @@
 {
   "name": "espresso-shot-timer",
-  "version": "1.1.0",
+  "version": "1.0.1",
   "description": "Precision espresso shot timer using accelerometer vibration detection.",
   "main": "index.js",
   "author": "Jan Hartje <jan@hartje.de>",
