@@ -66,6 +66,7 @@ export const useCalibration = ({ logger, onCalibrationComplete, ignoreSensorsRef
             uiResetTimeoutRef.current = null;
         }
         setIsCalibrating(false);
+        setCalibrationFinished(false);
         setCalibrationTimeLeft(0);
         // Release sensor block with a small delay
         ignoreSensorsRef.current = Date.now() + 1000;
