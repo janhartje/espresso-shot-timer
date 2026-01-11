@@ -15,15 +15,15 @@ interface InfoOverlayProps {
 
 type LegalScreen = 'menu' | 'imprint' | 'licenses';
 
-const LegalContentScreen = ({ 
-    title, 
-    onBack, 
+const LegalContentScreen = ({
+    title,
+    onBack,
     children,
     isLandscape = false,
     isDark = true
-}: { 
-    title: string; 
-    onBack?: () => void; 
+}: {
+    title: string;
+    onBack?: () => void;
     children: React.ReactNode;
     isLandscape?: boolean;
     isDark?: boolean;
@@ -31,7 +31,7 @@ const LegalContentScreen = ({
     <>
         <View className={`flex-row items-center ${isLandscape ? 'mb-4' : 'mb-6'}`}>
             {!isLandscape && onBack && (
-                <TouchableOpacity 
+                <TouchableOpacity
                     onPress={onBack}
                     className="mr-3 w-10 h-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/10"
                 >
@@ -42,7 +42,7 @@ const LegalContentScreen = ({
                 {title}
             </Text>
         </View>
-        <ScrollView 
+        <ScrollView
             className=""
             contentContainerStyle={{ paddingBottom: 40 }}
             showsVerticalScrollIndicator={false}
@@ -92,8 +92,8 @@ const LicensesContent = ({ isDark }: { isDark: boolean }) => (
 
 const AboutContent = ({ isDark }: { isDark: boolean }) => (
     <View className="items-center py-6 mb-4 border-b border-gray-200 dark:border-white/5">
-        <Image 
-            source={require('../../assets/icon.png')} 
+        <Image
+            source={require('../../assets/icon.png')}
             className="w-20 h-20 rounded-2xl mb-4"
             resizeMode="contain"
         />
@@ -101,10 +101,10 @@ const AboutContent = ({ isDark }: { isDark: boolean }) => (
             Espresso Shot Timer
         </Text>
         <Text className="text-zinc-500 dark:text-zinc-400 text-sm mb-3">
-            v1.0.0
+            v1.0.1
         </Text>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
             onPress={() => Linking.openURL('https://github.com/janhartje/espresso-shot-timer')}
             className="flex-row items-center gap-2 bg-black/5 dark:bg-white/10 px-4 py-2 rounded-full mb-4 active:bg-black/10 dark:active:bg-white/20"
         >
@@ -120,22 +120,22 @@ const AboutContent = ({ isDark }: { isDark: boolean }) => (
     </View>
 );
 
-const MenuRow = ({ 
-    icon: Icon, 
-    label, 
-    onPress, 
+const MenuRow = ({
+    icon: Icon,
+    label,
+    onPress,
     destructive = false,
     isActive = false,
     isDark = true
-}: { 
-    icon: any; 
-    label: string; 
-    onPress: () => void; 
+}: {
+    icon: any;
+    label: string;
+    onPress: () => void;
     destructive?: boolean;
     isActive?: boolean;
     isDark?: boolean;
 }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
         onPress={onPress}
         className={`flex-row items-center justify-between py-4 border-b border-gray-200 dark:border-white/5 ${isActive ? 'bg-black/5 dark:bg-white/10' : 'active:bg-black/5 dark:active:bg-white/5'}`}
     >
@@ -149,14 +149,14 @@ const MenuRow = ({
     </TouchableOpacity>
 );
 
-const MenuLinks = ({ 
-    currentScreen, 
-    onNavigate, 
+const MenuLinks = ({
+    currentScreen,
+    onNavigate,
     onResetOnboarding,
     isDark = true
-}: { 
-    currentScreen: LegalScreen, 
-    onNavigate: (screen: LegalScreen) => void, 
+}: {
+    currentScreen: LegalScreen,
+    onNavigate: (screen: LegalScreen) => void,
     onResetOnboarding: () => void,
     isDark?: boolean
 }) => (
@@ -165,29 +165,29 @@ const MenuLinks = ({
             <Text className="text-neutral-500 dark:text-white/40 text-xs font-bold uppercase tracking-wider mb-2">
                 {i18n.t('legal')}
             </Text>
-            <MenuRow 
-                icon={Shield} 
-                label={i18n.t('privacyPolicy')} 
-                onPress={() => Linking.openURL('https://janhartje.github.io/espresso-shot-timer/privacy')} 
+            <MenuRow
+                icon={Shield}
+                label={i18n.t('privacyPolicy')}
+                onPress={() => Linking.openURL('https://janhartje.github.io/espresso-shot-timer/privacy')}
                 isDark={isDark}
             />
-            <MenuRow 
-                icon={Scale} 
-                label={i18n.t('terms')} 
-                onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')} 
+            <MenuRow
+                icon={Scale}
+                label={i18n.t('terms')}
+                onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}
                 isDark={isDark}
             />
-            <MenuRow 
-                icon={FileText} 
-                label={i18n.t('imprint')} 
-                onPress={() => onNavigate('imprint')} 
+            <MenuRow
+                icon={FileText}
+                label={i18n.t('imprint')}
+                onPress={() => onNavigate('imprint')}
                 isActive={currentScreen === 'imprint'}
                 isDark={isDark}
             />
-            <MenuRow 
-                icon={Github} 
-                label={i18n.t('openSource')} 
-                onPress={() => onNavigate('licenses')} 
+            <MenuRow
+                icon={Github}
+                label={i18n.t('openSource')}
+                onPress={() => onNavigate('licenses')}
                 isActive={currentScreen === 'licenses'}
                 isDark={isDark}
             />
@@ -197,11 +197,11 @@ const MenuLinks = ({
             <Text className="text-neutral-500 dark:text-white/40 text-xs font-bold uppercase tracking-wider mb-2">
                 {i18n.t('settings')}
             </Text>
-            <MenuRow 
-                icon={RefreshCw} 
-                label={i18n.t('resetOnboarding')} 
-                onPress={onResetOnboarding} 
-                destructive 
+            <MenuRow
+                icon={RefreshCw}
+                label={i18n.t('resetOnboarding')}
+                onPress={onResetOnboarding}
+                destructive
                 isDark={isDark}
             />
         </View>
@@ -241,8 +241,8 @@ export const InfoOverlay: React.FC<InfoOverlayProps> = ({ isVisible, onClose, on
     };
 
     return (
-        <Animated.View 
-            entering={FadeIn.duration(300)} 
+        <Animated.View
+            entering={FadeIn.duration(300)}
             exiting={FadeOut.duration(300)}
             style={[StyleSheet.absoluteFill, { zIndex: 999, justifyContent: 'center', alignItems: 'center' }]}
         >
@@ -254,13 +254,13 @@ export const InfoOverlay: React.FC<InfoOverlayProps> = ({ isVisible, onClose, on
             )}
 
             {/* Content Container */}
-            <View 
-                className={isLandscape ? "w-full h-full max-w-5xl" : "w-[90%] max-w-md"} 
-                style={{ 
+            <View
+                className={isLandscape ? "w-full h-full max-w-5xl" : "w-[90%] max-w-md"}
+                style={{
                     maxHeight: isLandscape ? '100%' : '85%',
                     paddingTop: isLandscape ? insets.top + 20 : 0,
                     paddingBottom: isLandscape ? insets.bottom + 20 : 0,
-                    paddingHorizontal: isLandscape ? insets.left + 20 : 0, 
+                    paddingHorizontal: isLandscape ? insets.left + 20 : 0,
                 }}
             >
                 <View className={`bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] overflow-hidden shadow-2xl shadow-black ${isLandscape ? 'flex-1 flex-row' : ''}`}>
@@ -271,7 +271,7 @@ export const InfoOverlay: React.FC<InfoOverlayProps> = ({ isVisible, onClose, on
                             <View className="w-[35%] border-r border-gray-200 dark:border-white/10 flex-col">
                                 <View className="p-6 border-b border-gray-200 dark:border-white/10 flex-row justify-between items-center">
                                     <Text className="text-neutral-900 dark:text-white text-xl font-bold">{i18n.t('about')}</Text>
-                                    <TouchableOpacity 
+                                    <TouchableOpacity
                                         onPress={handleClose}
                                         className="w-8 h-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 active:bg-black/10 dark:active:bg-white/20"
                                     >
@@ -279,9 +279,9 @@ export const InfoOverlay: React.FC<InfoOverlayProps> = ({ isVisible, onClose, on
                                     </TouchableOpacity>
                                 </View>
                                 <ScrollView className="flex-1 px-4" contentContainerStyle={{ paddingVertical: 20 }}>
-                                    <MenuLinks 
-                                        currentScreen={currentScreen} 
-                                        onNavigate={setCurrentScreen} 
+                                    <MenuLinks
+                                        currentScreen={currentScreen}
+                                        onNavigate={setCurrentScreen}
                                         onResetOnboarding={onResetOnboarding}
                                         isDark={isDark}
                                     />
@@ -304,7 +304,7 @@ export const InfoOverlay: React.FC<InfoOverlayProps> = ({ isVisible, onClose, on
                                     <Text className="text-neutral-900 dark:text-white text-2xl font-bold tracking-tight">
                                         {i18n.t('about')}
                                     </Text>
-                                    <TouchableOpacity 
+                                    <TouchableOpacity
                                         onPress={handleClose}
                                         className="w-10 h-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 active:bg-black/10 dark:active:bg-white/20"
                                     >
@@ -313,15 +313,15 @@ export const InfoOverlay: React.FC<InfoOverlayProps> = ({ isVisible, onClose, on
                                 </View>
 
                                 {/* Menu Content */}
-                                <ScrollView 
+                                <ScrollView
                                     className="px-6"
                                     contentContainerStyle={{ paddingBottom: 24 }}
                                     showsVerticalScrollIndicator={false}
                                 >
                                     <AboutContent isDark={isDark} />
-                                    <MenuLinks 
-                                        currentScreen={currentScreen} 
-                                        onNavigate={setCurrentScreen} 
+                                    <MenuLinks
+                                        currentScreen={currentScreen}
+                                        onNavigate={setCurrentScreen}
                                         onResetOnboarding={onResetOnboarding}
                                         isDark={isDark}
                                     />

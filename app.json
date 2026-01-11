@@ -2,7 +2,7 @@
   "expo": {
     "name": "espresso-shot-timer",
     "slug": "espresso-shot-timer",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.janhartje.espressoshottimer",
-      "versionCode": 10,
+      "versionCode": 1,
       "blockedPermissions": [
         "android.permission.ACTIVITY_RECOGNITION"
       ]
@@ -30,7 +30,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.janhartje.espressoshottimer",
-      "buildNumber": "9",
+      "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
